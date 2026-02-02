@@ -45,6 +45,20 @@ app.get('/login', (c) => {
   return c.html(getLoginPage());
 });
 
+// 디버그: 쿠키 상태 확인
+app.get('/debug/cookies', async (c) => {
+  const { getCookie } = await import('hono/cookie');
+  const token = getCookie(c, 'token');
+  const allCookies = c.req.header('Cookie');
+
+  return c.json({
+    hasToken: !!token,
+    tokenPreview: token ? token.substring(0, 50) + '...' : null,
+    cookieHeader: allCookies || 'No cookies',
+    jwtSecretSet: !!c.env.JWT_SECRET
+  });
+});
+
 // 인증 미들웨어 적용 (login 제외)
 app.use('*', adminAuth);
 
