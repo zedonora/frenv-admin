@@ -17,18 +17,18 @@ database_id = "8c03f04e-66bb-44ad-95ec-2f6cde8fe028"
 [[d1_databases]]
 binding = "PULSE_DB"
 database_name = "trend-hunter-db"
-database_id = "b54e08e9-f54f-4558-898d-f0b676219a65"
+database_id = "8f20ff06-9531-4530-939b-03c45bbeb7ea"
 
 # D1 데이터베이스 바인딩 - i18n DB
 [[d1_databases]]
 binding = "I18N_DB"
 database_name = "frenv-i18n-db"
-database_id = "5e4b45e7-9b2f-4d3c-8a1e-7f6c5d4b3a2e"
+database_id = "f8f7547c-fa3e-4362-8848-e5ffd7448d60"
 
 # KV 바인딩 - Config
 [[kv_namespaces]]
 binding = "CONFIG_KV"
-id = "a1b2c3d4e5f6g7h8i9j0"
+id = "2bb070b1b77048e3bffba033b8ad1c37"
 
 # 환경 변수
 [vars]
@@ -48,17 +48,17 @@ database_id = "8c03f04e-66bb-44ad-95ec-2f6cde8fe028"
 [[env.production.d1_databases]]
 binding = "PULSE_DB"
 database_name = "trend-hunter-db"
-database_id = "b54e08e9-f54f-4558-898d-f0b676219a65"
+database_id = "8f20ff06-9531-4530-939b-03c45bbeb7ea"
 
 [[env.production.d1_databases]]
 binding = "I18N_DB"
 database_name = "frenv-i18n-db"
-database_id = "5e4b45e7-9b2f-4d3c-8a1e-7f6c5d4b3a2e"
+database_id = "f8f7547c-fa3e-4362-8848-e5ffd7448d60"
 
 # KV 바인딩 (프로덕션)
 [[env.production.kv_namespaces]]
 binding = "CONFIG_KV"
-id = "a1b2c3d4e5f6g7h8i9j0"
+id = "2bb070b1b77048e3bffba033b8ad1c37"
 
 # 커스텀 도메인 라우팅
 [[env.production.routes]]
