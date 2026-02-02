@@ -1,5 +1,6 @@
 // 사용자 관리 API
 import { Hono } from 'hono';
+import { AdminUser } from '../middleware/auth';
 
 interface Env {
   AUTH_DB: D1Database;
@@ -69,6 +70,7 @@ users.get('/:id', async (c) => {
 
 // 사용자 수정
 users.patch('/:id', async (c) => {
+  const currentUser = c.get('user') as AdminUser;
   const id = c.req.param('id');
   const { role, plan, name } = await c.req.json<{
     role?: string;
@@ -79,10 +81,19 @@ users.patch('/:id', async (c) => {
   const updates: string[] = [];
   const params: string[] = [];
 
+  // role 변경은 superadmin만 가능
   if (role) {
+    if (currentUser.role !== 'superadmin') {
+      return c.json({ error: 'Only superadmin can change user roles' }, 403);
+    }
+    // superadmin role은 변경 불가 (보호)
+    if (role === 'superadmin') {
+      return c.json({ error: 'Cannot assign superadmin role' }, 403);
+    }
     updates.push('role = ?');
     params.push(role);
   }
+
   if (plan) {
     updates.push('plan = ?');
     params.push(plan);

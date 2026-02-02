@@ -215,6 +215,7 @@ export function getDashboardPage(section: string = 'overview'): string {
           font-size: 11px;
           font-weight: 600;
         }
+        .badge-superadmin { background: rgba(234, 179, 8, 0.2); color: #eab308; }
         .badge-admin { background: rgba(244, 63, 94, 0.2); color: #f43f5e; }
         .badge-user { background: rgba(99, 102, 241, 0.2); color: #6366f1; }
         .badge-free { background: rgba(148, 163, 184, 0.2); color: #94a3b8; }
@@ -576,7 +577,34 @@ export function getDashboardPage(section: string = 'overview'): string {
         }
 
         // Placeholder functions for actions
-        function editUser(id) { alert('Edit user: ' + id); }
+        async function editUser(id) {
+          const action = prompt('Enter action: role (admin/user), plan (free/pro/enterprise), or name');
+          if (!action) return;
+
+          let body = {};
+          if (action === 'admin' || action === 'user') {
+            body = { role: action };
+          } else if (action === 'free' || action === 'pro' || action === 'enterprise') {
+            body = { plan: action };
+          } else {
+            body = { name: action };
+          }
+
+          const res = await fetch('/api/users/' + id, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify(body)
+          });
+
+          if (res.ok) {
+            alert('Updated!');
+            loadUsers();
+          } else {
+            const data = await res.json();
+            alert(data.error || 'Failed to update');
+          }
+        }
         function viewUsage(id) { alert('View usage: ' + id); }
         function deleteKey(id) { if(confirm('Delete?')) fetch('/api/api-keys/'+id, {method:'DELETE',credentials:'include'}).then(() => loadApiKeys()); }
         function editProduct(id) { alert('Edit product: ' + id); }

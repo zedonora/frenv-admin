@@ -106,8 +106,8 @@ export async function adminAuth(c: Context<{ Bindings: Env }>, next: Next) {
     return c.redirect('/login');
   }
 
-  // Admin role 체크
-  if (payload.role !== 'admin') {
+  // Admin/Superadmin role 체크
+  if (payload.role !== 'admin' && payload.role !== 'superadmin') {
     return c.json({ error: 'Admin access required' }, 403);
   }
 
