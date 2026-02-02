@@ -660,6 +660,13 @@ export function getDashboardPage(section: string = 'overview'): string {
               <span class="nav-icon">🌐</span> 번역 관리
             </a>
           </div>
+
+          <div class="nav-section">
+            <div class="nav-section-title">English 서비스</div>
+            <a href="/english" class="nav-item ${section === 'english' ? 'active' : ''}">
+              <span class="nav-icon">📚</span> 학습 관리
+            </a>
+          </div>
         </nav>
 
         <main class="main">
@@ -712,6 +719,7 @@ export function getDashboardPage(section: string = 'overview'): string {
             case 'products': await loadProducts(); break;
             case 'posts': await loadPosts(); break;
             case 'translations': await loadTranslations(); break;
+            case 'english': await loadEnglish(); break;
           }
         }
 
@@ -847,6 +855,39 @@ export function getDashboardPage(section: string = 'overview'): string {
                     <div class="service-status">
                       <span class="status-dot"></span>
                       정상
+                    </div>
+                  </div>
+                  <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #06b6d4, #0891b2);">📚</div>
+                    <div class="service-info">
+                      <h4>English</h4>
+                      <p>english.frenv.pe.kr</p>
+                    </div>
+                    <div class="service-status">
+                      <span class="status-dot"></span>
+                      정상
+                    </div>
+                  </div>
+                  <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #84cc16, #65a30d);">🎮</div>
+                    <div class="service-info">
+                      <h4>Game</h4>
+                      <p>game.frenv.pe.kr</p>
+                    </div>
+                    <div class="service-status">
+                      <span class="status-dot"></span>
+                      정상
+                    </div>
+                  </div>
+                  <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #eab308, #ca8a04);">💰</div>
+                    <div class="service-info">
+                      <h4>Invest</h4>
+                      <p>invest.frenv.pe.kr</p>
+                    </div>
+                    <div class="service-status">
+                      <span class="status-dot offline"></span>
+                      개발 중
                     </div>
                   </div>
                 </div>
@@ -1181,6 +1222,194 @@ export function getDashboardPage(section: string = 'overview'): string {
 
         function filterTranslations() { /* 구현 예정 */ }
 
+        async function loadEnglish() {
+          // 먼저 설정 확인
+          const configRes = await fetch('/api/english/config', { credentials: 'include' });
+          const configData = await configRes.json();
+
+          if (!configData.configured) {
+            document.getElementById('content').innerHTML = \`
+              <div class="card">
+                <div class="card-header"><h2>Supabase 연동 설정</h2></div>
+                <p style="color: var(--text-secondary); margin-bottom: 24px;">
+                  English 서비스는 Supabase를 사용합니다. 관리를 위해 Supabase 설정이 필요합니다.
+                </p>
+                <div class="filters" style="flex-direction: column; gap: 16px;">
+                  <input type="text" id="supabaseUrl" placeholder="Supabase URL (예: https://xxx.supabase.co)" style="width: 100%;">
+                  <input type="password" id="supabaseKey" placeholder="Supabase Service Role Key" style="width: 100%;">
+                  <button class="btn btn-primary" onclick="saveEnglishConfig()">설정 저장</button>
+                </div>
+              </div>
+            \`;
+            return;
+          }
+
+          try {
+            // 통계 로드
+            const [statsRes, lessonsRes, vocabRes, logsRes] = await Promise.all([
+              fetch('/api/english/stats', { credentials: 'include' }),
+              fetch('/api/english/lessons?limit=10', { credentials: 'include' }),
+              fetch('/api/english/vocab?limit=10', { credentials: 'include' }),
+              fetch('/api/english/study-logs?limit=20', { credentials: 'include' })
+            ]);
+
+            const [stats, lessons, vocab, logs] = await Promise.all([
+              statsRes.json(),
+              lessonsRes.json(),
+              vocabRes.json(),
+              logsRes.json()
+            ]);
+
+            document.getElementById('content').innerHTML = \`
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-card-header">
+                    <h3>총 어휘</h3>
+                    <div class="stat-icon">📝</div>
+                  </div>
+                  <div class="value">\${stats.totalVocab || 0}</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-header">
+                    <h3>레슨 수</h3>
+                    <div class="stat-icon">📖</div>
+                  </div>
+                  <div class="value">\${stats.totalLessons || 0}</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-header">
+                    <h3>학습 기록</h3>
+                    <div class="stat-icon">📊</div>
+                  </div>
+                  <div class="value">\${stats.totalStudyLogs || 0}</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-header">
+                    <h3>API 호출</h3>
+                    <div class="stat-icon">🤖</div>
+                  </div>
+                  <div class="value">\${stats.totalApiCalls || 0}</div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h2>최근 레슨 (AI 생성)</h2>
+                  <a href="https://english.frenv.pe.kr" target="_blank" class="btn btn-secondary">앱 열기</a>
+                </div>
+                <div class="table-wrapper">
+                  <table>
+                    <tr><th>날짜</th><th>주제 (영어)</th><th>주제 (한국어)</th><th>표현 수</th></tr>
+                    \${lessons.lessons?.map(l => \`
+                      <tr>
+                        <td>\${l.date}</td>
+                        <td>\${l.topic_en || '-'}</td>
+                        <td>\${l.topic_ko || '-'}</td>
+                        <td>\${Array.isArray(l.expressions) ? l.expressions.length : 0}개</td>
+                      </tr>
+                    \`).join('') || '<tr><td colspan="4" class="empty">레슨이 없습니다</td></tr>'}
+                  </table>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header"><h2>어휘 카드 (SRS)</h2></div>
+                <div class="table-wrapper">
+                  <table>
+                    <tr><th>단어</th><th>뜻</th><th>복습 주기</th><th>다음 복습</th><th>난이도</th></tr>
+                    \${vocab.vocab?.map(v => \`
+                      <tr>
+                        <td><strong>\${v.word}</strong></td>
+                        <td>\${v.definition || '-'}</td>
+                        <td>\${v.interval || 0}일</td>
+                        <td>\${v.next_review_date ? new Date(v.next_review_date).toLocaleDateString('ko-KR') : '-'}</td>
+                        <td>\${(v.easiness_factor || 2.5).toFixed(1)}</td>
+                      </tr>
+                    \`).join('') || '<tr><td colspan="5" class="empty">어휘가 없습니다</td></tr>'}
+                  </table>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header"><h2>최근 학습 활동</h2></div>
+                <div class="table-wrapper">
+                  <table>
+                    <tr><th>유형</th><th>내용</th><th>시간</th></tr>
+                    \${logs.logs?.map(l => \`
+                      <tr>
+                        <td><span class="badge badge-\${l.activity_type === 'correction' ? 'published' : 'draft'}">\${
+                          l.activity_type === 'correction' ? '교정' :
+                          l.activity_type === 'review' ? '복습' :
+                          l.activity_type === 'voice_practice' ? '음성' : l.activity_type
+                        }</span></td>
+                        <td>\${l.content?.substring(0, 60) || '-'}\${l.content?.length > 60 ? '...' : ''}</td>
+                        <td>\${l.created_at ? new Date(l.created_at).toLocaleString('ko-KR') : '-'}</td>
+                      </tr>
+                    \`).join('') || '<tr><td colspan="3" class="empty">학습 기록이 없습니다</td></tr>'}
+                  </table>
+                </div>
+              </div>
+
+              <div class="card" style="border-color: rgba(6, 182, 212, 0.3);">
+                <div class="card-header"><h2>🚀 개선 아이디어</h2></div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                  <div style="padding: 16px; background: rgba(6, 182, 212, 0.1); border-radius: 12px;">
+                    <h4 style="margin-bottom: 8px;">👶 멀티 유저 지원</h4>
+                    <p style="color: var(--text-secondary); font-size: 13px;">아이별 프로필 생성, 진도 분리 관리</p>
+                  </div>
+                  <div style="padding: 16px; background: rgba(168, 85, 247, 0.1); border-radius: 12px;">
+                    <h4 style="margin-bottom: 8px;">📈 학습 대시보드</h4>
+                    <p style="color: var(--text-secondary); font-size: 13px;">주간/월간 학습 리포트, 취약점 분석</p>
+                  </div>
+                  <div style="padding: 16px; background: rgba(245, 158, 11, 0.1); border-radius: 12px;">
+                    <h4 style="margin-bottom: 8px;">🏆 게이미피케이션</h4>
+                    <p style="color: var(--text-secondary); font-size: 13px;">뱃지, 스트릭, 레벨 시스템 추가</p>
+                  </div>
+                  <div style="padding: 16px; background: rgba(16, 185, 129, 0.1); border-radius: 12px;">
+                    <h4 style="margin-bottom: 8px;">🎵 발음 평가</h4>
+                    <p style="color: var(--text-secondary); font-size: 13px;">Web Speech API 점수화, 피드백</p>
+                  </div>
+                  <div style="padding: 16px; background: rgba(244, 63, 94, 0.1); border-radius: 12px;">
+                    <h4 style="margin-bottom: 8px;">📚 커리큘럼 관리</h4>
+                    <p style="color: var(--text-secondary); font-size: 13px;">난이도별 레슨 구성, 학습 경로</p>
+                  </div>
+                  <div style="padding: 16px; background: rgba(59, 130, 246, 0.1); border-radius: 12px;">
+                    <h4 style="margin-bottom: 8px;">📱 오프라인 모드</h4>
+                    <p style="color: var(--text-secondary); font-size: 13px;">레슨 다운로드, 인터넷 없이 학습</p>
+                  </div>
+                </div>
+              </div>
+            \`;
+          } catch (e) {
+            showError('English 데이터를 불러오지 못했습니다.');
+          }
+        }
+
+        async function saveEnglishConfig() {
+          const url = document.getElementById('supabaseUrl').value;
+          const key = document.getElementById('supabaseKey').value;
+
+          if (!url || !key) {
+            alert('URL과 Service Key를 모두 입력하세요.');
+            return;
+          }
+
+          const res = await fetch('/api/english/config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ supabaseUrl: url, supabaseServiceKey: key })
+          });
+
+          if (res.ok) {
+            alert('설정이 저장되었습니다!');
+            loadEnglish();
+          } else {
+            const data = await res.json();
+            alert(data.error || '저장에 실패했습니다.');
+          }
+        }
+
         init();
       </script>
     </body>
@@ -1196,7 +1425,8 @@ function getSectionTitle(section: string): string {
     'api-keys': 'API 키 관리',
     'products': '상품 관리',
     'posts': '포스트 관리',
-    'translations': '번역 관리'
+    'translations': '번역 관리',
+    'english': 'English 학습 관리'
   };
   return titles[section] || '대시보드';
 }

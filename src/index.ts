@@ -11,6 +11,7 @@ import productsRoutes from './routes/products';
 import postsRoutes from './routes/posts';
 import translationsRoutes from './routes/translations';
 import analyticsRoutes from './routes/analytics';
+import englishRoutes from './routes/english';
 import { getDashboardPage, getLoginPage } from './pages/dashboard';
 
 export interface Env {
@@ -69,6 +70,7 @@ app.route('/api/products', productsRoutes);
 app.route('/api/posts', postsRoutes);
 app.route('/api/translations', translationsRoutes);
 app.route('/api/analytics', analyticsRoutes);
+app.route('/api/english', englishRoutes);
 
 // 대시보드 페이지
 app.get('/', (c) => {
@@ -81,6 +83,7 @@ app.get('/products', (c) => c.html(getDashboardPage('products')));
 app.get('/posts', (c) => c.html(getDashboardPage('posts')));
 app.get('/translations', (c) => c.html(getDashboardPage('translations')));
 app.get('/analytics', (c) => c.html(getDashboardPage('analytics')));
+app.get('/english', (c) => c.html(getDashboardPage('english')));
 
 // 헬스 체크
 app.get('/health', (c) => {
