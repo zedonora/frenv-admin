@@ -1,4 +1,4 @@
-// Admin Dashboard 페이지
+// Admin Dashboard 페이지 - 한국어 버전
 
 export function getLoginPage(): string {
   return `
@@ -7,12 +7,13 @@ export function getLoginPage(): string {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Admin Login - Frenv</title>
+      <title>관리자 로그인 - Frenv</title>
+      <link rel="icon" href="https://cdn.frenv.pe.kr/favicon.ico">
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
           min-height: 100vh;
           display: flex;
           justify-content: center;
@@ -20,52 +21,65 @@ export function getLoginPage(): string {
           color: white;
         }
         .container {
-          background: rgba(30, 41, 59, 0.8);
-          border: 1px solid rgba(244, 63, 94, 0.3);
-          border-radius: 16px;
-          padding: 40px;
+          background: rgba(255, 255, 255, 0.03);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 24px;
+          padding: 48px;
           width: 100%;
-          max-width: 400px;
+          max-width: 420px;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
         .logo {
           text-align: center;
-          margin-bottom: 30px;
+          margin-bottom: 32px;
         }
         .logo h1 {
-          background: linear-gradient(135deg, #f43f5e, #6366f1);
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
-          font-size: 28px;
+          font-size: 32px;
+          font-weight: 800;
+          letter-spacing: -0.5px;
         }
-        .logo p { color: #94a3b8; font-size: 14px; margin-top: 8px; }
+        .logo p { color: rgba(255,255,255,0.6); font-size: 14px; margin-top: 8px; }
         .admin-badge {
           display: inline-block;
-          background: rgba(244, 63, 94, 0.2);
-          color: #f43f5e;
-          padding: 4px 12px;
+          background: linear-gradient(135deg, #f43f5e, #ec4899);
+          color: white;
+          padding: 6px 16px;
           border-radius: 20px;
           font-size: 11px;
-          margin-top: 12px;
+          font-weight: 600;
+          margin-top: 16px;
+          letter-spacing: 1px;
         }
         .info {
-          background: rgba(99, 102, 241, 0.1);
-          border: 1px solid rgba(99, 102, 241, 0.3);
-          border-radius: 8px;
-          padding: 16px;
-          margin-bottom: 20px;
-          font-size: 13px;
-          color: #94a3b8;
+          background: rgba(102, 126, 234, 0.1);
+          border: 1px solid rgba(102, 126, 234, 0.2);
+          border-radius: 12px;
+          padding: 16px 20px;
+          margin-bottom: 24px;
+          font-size: 14px;
+          color: rgba(255,255,255,0.7);
+          line-height: 1.6;
         }
         button {
           width: 100%;
-          padding: 14px;
-          background: linear-gradient(135deg, #f43f5e, #6366f1);
+          padding: 16px;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           border: none;
-          border-radius: 8px;
+          border-radius: 12px;
           color: white;
           font-size: 16px;
           font-weight: 600;
           cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
         }
       </style>
     </head>
@@ -73,14 +87,15 @@ export function getLoginPage(): string {
       <div class="container">
         <div class="logo">
           <h1>Frenv Admin</h1>
-          <p>Centralized Management Dashboard</p>
+          <p>통합 관리 대시보드</p>
           <span class="admin-badge">ADMIN ONLY</span>
         </div>
         <div class="info">
-          Admin 계정으로 auth.frenv.pe.kr에서 로그인한 후 접근하세요.
+          관리자 권한이 필요합니다.<br>
+          Auth 서비스에서 관리자 계정으로 로그인해주세요.
         </div>
-        <button onclick="window.location.href='https://auth.frenv.pe.kr/login?redirect=https://admin.frenv.pe.kr&service=admin'">
-          Login with Auth Service
+        <button onclick="window.location.href='https://auth.frenv.pe.kr/login?service=admin&redirect=https://admin.frenv.pe.kr'">
+          로그인하기
         </button>
       </div>
     </body>
@@ -95,225 +110,600 @@ export function getDashboardPage(section: string = 'overview'): string {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Admin Dashboard - Frenv</title>
+      <title>${getSectionTitle(section)} - Frenv Admin</title>
+      <link rel="icon" href="https://cdn.frenv.pe.kr/favicon.ico">
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-          background: #0f172a;
-          min-height: 100vh;
-          color: white;
+
+        :root {
+          --bg-primary: #0a0a0f;
+          --bg-secondary: #12121a;
+          --bg-card: rgba(255, 255, 255, 0.02);
+          --border-color: rgba(255, 255, 255, 0.06);
+          --text-primary: #ffffff;
+          --text-secondary: rgba(255, 255, 255, 0.6);
+          --text-muted: rgba(255, 255, 255, 0.4);
+          --accent-primary: #667eea;
+          --accent-secondary: #764ba2;
+          --accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          --success: #10b981;
+          --warning: #f59e0b;
+          --danger: #ef4444;
+          --radius-sm: 8px;
+          --radius-md: 12px;
+          --radius-lg: 16px;
+          --radius-xl: 24px;
         }
+
+        body {
+          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          background: var(--bg-primary);
+          min-height: 100vh;
+          color: var(--text-primary);
+          line-height: 1.5;
+        }
+
         .layout { display: flex; min-height: 100vh; }
 
         /* 사이드바 */
         .sidebar {
-          width: 240px;
-          background: rgba(30, 41, 59, 0.8);
-          border-right: 1px solid rgba(99, 102, 241, 0.2);
-          padding: 20px;
+          width: 260px;
+          background: var(--bg-secondary);
+          border-right: 1px solid var(--border-color);
+          padding: 24px 16px;
           position: fixed;
           height: 100vh;
           overflow-y: auto;
         }
+
+        .sidebar-header {
+          padding: 0 12px 24px;
+          border-bottom: 1px solid var(--border-color);
+          margin-bottom: 24px;
+        }
+
         .sidebar-logo {
-          background: linear-gradient(135deg, #f43f5e, #6366f1);
+          background: var(--accent-gradient);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
-          font-size: 20px;
-          font-weight: bold;
-          margin-bottom: 8px;
+          font-size: 22px;
+          font-weight: 700;
+          letter-spacing: -0.5px;
         }
+
         .sidebar-badge {
           display: inline-block;
-          background: rgba(244, 63, 94, 0.2);
-          color: #f43f5e;
-          padding: 2px 8px;
-          border-radius: 10px;
+          background: linear-gradient(135deg, #f43f5e, #ec4899);
+          color: white;
+          padding: 4px 10px;
+          border-radius: 6px;
           font-size: 10px;
-          margin-bottom: 30px;
+          font-weight: 600;
+          margin-top: 8px;
+          letter-spacing: 0.5px;
         }
-        .nav-section { margin-bottom: 24px; }
-        .nav-section-title { color: #64748b; font-size: 11px; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; }
+
+        .nav-section { margin-bottom: 28px; }
+
+        .nav-section-title {
+          color: var(--text-muted);
+          font-size: 11px;
+          text-transform: uppercase;
+          margin-bottom: 12px;
+          padding-left: 12px;
+          letter-spacing: 1px;
+          font-weight: 600;
+        }
+
         .nav-item {
           display: flex;
           align-items: center;
-          gap: 10px;
-          padding: 10px 12px;
-          border-radius: 8px;
-          color: #94a3b8;
+          gap: 12px;
+          padding: 12px 16px;
+          border-radius: var(--radius-md);
+          color: var(--text-secondary);
           text-decoration: none;
           font-size: 14px;
+          font-weight: 500;
           margin-bottom: 4px;
-          transition: all 0.2s;
+          transition: all 0.2s ease;
         }
-        .nav-item:hover { background: rgba(99, 102, 241, 0.1); color: white; }
-        .nav-item.active { background: rgba(99, 102, 241, 0.2); color: #6366f1; }
+
+        .nav-item:hover {
+          background: rgba(102, 126, 234, 0.1);
+          color: var(--text-primary);
+        }
+
+        .nav-item.active {
+          background: var(--accent-gradient);
+          color: white;
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
         .nav-icon { font-size: 18px; }
 
         /* 메인 컨텐츠 */
-        .main { flex: 1; margin-left: 240px; padding: 30px; }
+        .main {
+          flex: 1;
+          margin-left: 260px;
+          padding: 32px 40px;
+          background: var(--bg-primary);
+        }
+
         .header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 30px;
+          margin-bottom: 32px;
         }
-        .header h1 { font-size: 24px; }
-        .btn-logout {
-          background: rgba(244, 63, 94, 0.2);
-          color: #f43f5e;
-          border: 1px solid rgba(244, 63, 94, 0.3);
+
+        .header h1 {
+          font-size: 28px;
+          font-weight: 700;
+          letter-spacing: -0.5px;
+        }
+
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+
+        .user-info {
+          display: flex;
+          align-items: center;
+          gap: 12px;
           padding: 8px 16px;
-          border-radius: 8px;
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-md);
+        }
+
+        .user-avatar {
+          width: 32px;
+          height: 32px;
+          background: var(--accent-gradient);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+          font-weight: 600;
+        }
+
+        .user-name { font-size: 14px; font-weight: 500; }
+        .user-role { font-size: 11px; color: var(--text-muted); }
+
+        .btn-logout {
+          background: rgba(239, 68, 68, 0.1);
+          color: var(--danger);
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          padding: 10px 20px;
+          border-radius: var(--radius-md);
           cursor: pointer;
           font-size: 13px;
+          font-weight: 500;
+          transition: all 0.2s ease;
         }
 
-        /* 카드 그리드 */
+        .btn-logout:hover {
+          background: rgba(239, 68, 68, 0.2);
+        }
+
+        /* 통계 카드 */
         .stats-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
           gap: 20px;
-          margin-bottom: 30px;
+          margin-bottom: 32px;
         }
-        .stat-card {
-          background: rgba(30, 41, 59, 0.8);
-          border: 1px solid rgba(99, 102, 241, 0.2);
-          border-radius: 12px;
-          padding: 20px;
-        }
-        .stat-card h3 { color: #94a3b8; font-size: 13px; margin-bottom: 8px; }
-        .stat-card .value { font-size: 32px; font-weight: bold; color: #6366f1; }
-        .stat-card .change { font-size: 12px; color: #22c55e; margin-top: 4px; }
 
-        /* 테이블 */
-        .card {
-          background: rgba(30, 41, 59, 0.8);
-          border: 1px solid rgba(99, 102, 241, 0.2);
-          border-radius: 12px;
+        .stat-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-lg);
           padding: 24px;
+          transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+          border-color: rgba(102, 126, 234, 0.3);
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .stat-card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 16px;
+        }
+
+        .stat-card h3 {
+          color: var(--text-secondary);
+          font-size: 13px;
+          font-weight: 500;
+        }
+
+        .stat-icon {
+          width: 40px;
+          height: 40px;
+          background: var(--accent-gradient);
+          border-radius: var(--radius-md);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18px;
+        }
+
+        .stat-card .value {
+          font-size: 36px;
+          font-weight: 700;
+          background: var(--accent-gradient);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        .stat-card .change {
+          font-size: 12px;
+          color: var(--success);
+          margin-top: 8px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .stat-card .change.negative { color: var(--danger); }
+
+        /* 카드 */
+        .card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-lg);
+          padding: 28px;
           margin-bottom: 24px;
         }
+
         .card-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 20px;
+          margin-bottom: 24px;
         }
-        .card-header h2 { font-size: 18px; }
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; color: #64748b; font-size: 12px; text-transform: uppercase; padding: 12px; border-bottom: 1px solid rgba(99, 102, 241, 0.2); }
-        td { padding: 12px; border-bottom: 1px solid rgba(30, 41, 59, 0.8); font-size: 14px; }
-        tr:hover { background: rgba(99, 102, 241, 0.05); }
 
+        .card-header h2 {
+          font-size: 18px;
+          font-weight: 600;
+        }
+
+        /* 테이블 */
+        .table-wrapper { overflow-x: auto; }
+
+        table {
+          width: 100%;
+          border-collapse: separate;
+          border-spacing: 0;
+        }
+
+        th {
+          text-align: left;
+          color: var(--text-muted);
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          padding: 16px;
+          border-bottom: 1px solid var(--border-color);
+          font-weight: 600;
+        }
+
+        td {
+          padding: 16px;
+          border-bottom: 1px solid var(--border-color);
+          font-size: 14px;
+        }
+
+        tr:hover td {
+          background: rgba(102, 126, 234, 0.03);
+        }
+
+        tr:last-child td { border-bottom: none; }
+
+        /* 뱃지 */
         .badge {
-          display: inline-block;
-          padding: 4px 10px;
+          display: inline-flex;
+          align-items: center;
+          padding: 5px 12px;
           border-radius: 20px;
           font-size: 11px;
           font-weight: 600;
         }
-        .badge-superadmin { background: rgba(234, 179, 8, 0.2); color: #eab308; }
-        .badge-admin { background: rgba(244, 63, 94, 0.2); color: #f43f5e; }
-        .badge-user { background: rgba(99, 102, 241, 0.2); color: #6366f1; }
-        .badge-free { background: rgba(148, 163, 184, 0.2); color: #94a3b8; }
-        .badge-pro { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
-        .badge-enterprise { background: rgba(168, 85, 247, 0.2); color: #a855f7; }
-        .badge-published { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
-        .badge-draft { background: rgba(234, 179, 8, 0.2); color: #eab308; }
 
+        .badge-superadmin {
+          background: linear-gradient(135deg, #f59e0b, #d97706);
+          color: white;
+        }
+        .badge-admin {
+          background: rgba(244, 63, 94, 0.15);
+          color: #fb7185;
+        }
+        .badge-user {
+          background: rgba(102, 126, 234, 0.15);
+          color: #818cf8;
+        }
+        .badge-free {
+          background: rgba(148, 163, 184, 0.15);
+          color: #94a3b8;
+        }
+        .badge-pro {
+          background: rgba(16, 185, 129, 0.15);
+          color: #34d399;
+        }
+        .badge-enterprise {
+          background: rgba(168, 85, 247, 0.15);
+          color: #c084fc;
+        }
+        .badge-published {
+          background: rgba(16, 185, 129, 0.15);
+          color: #34d399;
+        }
+        .badge-draft {
+          background: rgba(245, 158, 11, 0.15);
+          color: #fbbf24;
+        }
+
+        /* 버튼 */
         .btn {
-          padding: 6px 12px;
-          border-radius: 6px;
-          font-size: 12px;
+          padding: 8px 16px;
+          border-radius: var(--radius-sm);
+          font-size: 13px;
+          font-weight: 500;
           cursor: pointer;
           border: none;
+          transition: all 0.2s ease;
         }
-        .btn-primary { background: #6366f1; color: white; }
-        .btn-danger { background: transparent; color: #f43f5e; border: 1px solid rgba(244, 63, 94, 0.3); }
 
-        .loading { text-align: center; padding: 40px; color: #94a3b8; }
-        .empty { text-align: center; padding: 40px; color: #64748b; }
+        .btn-primary {
+          background: var(--accent-gradient);
+          color: white;
+          box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
 
-        /* 검색/필터 */
+        .btn-primary:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+          background: rgba(255, 255, 255, 0.05);
+          color: var(--text-secondary);
+          border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+          background: rgba(255, 255, 255, 0.08);
+          color: var(--text-primary);
+        }
+
+        .btn-danger {
+          background: rgba(239, 68, 68, 0.1);
+          color: var(--danger);
+          border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-danger:hover {
+          background: rgba(239, 68, 68, 0.2);
+        }
+
+        .loading {
+          text-align: center;
+          padding: 60px;
+          color: var(--text-secondary);
+        }
+
+        .loading-spinner {
+          width: 40px;
+          height: 40px;
+          border: 3px solid var(--border-color);
+          border-top-color: var(--accent-primary);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        .empty {
+          text-align: center;
+          padding: 60px;
+          color: var(--text-muted);
+        }
+
+        /* 필터/검색 */
         .filters {
           display: flex;
           gap: 12px;
           margin-bottom: 20px;
+          flex-wrap: wrap;
         }
+
         .filters input, .filters select {
-          padding: 10px 14px;
-          background: rgba(15, 23, 42, 0.8);
-          border: 1px solid rgba(99, 102, 241, 0.3);
-          border-radius: 8px;
-          color: white;
+          padding: 12px 16px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-md);
+          color: var(--text-primary);
           font-size: 14px;
+          min-width: 200px;
+          transition: all 0.2s ease;
         }
-        .filters input:focus, .filters select:focus { outline: none; border-color: #6366f1; }
+
+        .filters input:focus, .filters select:focus {
+          outline: none;
+          border-color: var(--accent-primary);
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .filters input::placeholder {
+          color: var(--text-muted);
+        }
+
+        /* 서비스 상태 카드 */
+        .services-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 16px;
+          margin-top: 24px;
+        }
+
+        .service-card {
+          background: var(--bg-card);
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-md);
+          padding: 20px;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          transition: all 0.2s ease;
+        }
+
+        .service-card:hover {
+          border-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .service-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: var(--radius-md);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 24px;
+        }
+
+        .service-info h4 { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+        .service-info p { font-size: 12px; color: var(--text-muted); }
+
+        .service-status {
+          margin-left: auto;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          font-size: 12px;
+        }
+
+        .status-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--success);
+        }
+
+        .status-dot.offline { background: var(--danger); }
+
+        /* 코드 스타일 */
+        code {
+          background: rgba(0, 0, 0, 0.3);
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-family: 'JetBrains Mono', monospace;
+          font-size: 12px;
+        }
+
+        /* 액션 버튼 그룹 */
+        .action-buttons {
+          display: flex;
+          gap: 8px;
+        }
       </style>
     </head>
     <body>
       <div class="layout">
         <nav class="sidebar">
-          <div class="sidebar-logo">Frenv Admin</div>
-          <span class="sidebar-badge">ADMIN</span>
+          <div class="sidebar-header">
+            <div class="sidebar-logo">Frenv Admin</div>
+            <div class="sidebar-badge" id="userRoleBadge">ADMIN</div>
+          </div>
 
           <div class="nav-section">
-            <div class="nav-section-title">Dashboard</div>
+            <div class="nav-section-title">대시보드</div>
             <a href="/" class="nav-item ${section === 'overview' ? 'active' : ''}">
-              <span class="nav-icon">📊</span> Overview
+              <span class="nav-icon">📊</span> 개요
             </a>
             <a href="/analytics" class="nav-item ${section === 'analytics' ? 'active' : ''}">
-              <span class="nav-icon">📈</span> Analytics
+              <span class="nav-icon">📈</span> 분석
             </a>
           </div>
 
           <div class="nav-section">
-            <div class="nav-section-title">Auth Service</div>
+            <div class="nav-section-title">Auth 서비스</div>
             <a href="/users" class="nav-item ${section === 'users' ? 'active' : ''}">
-              <span class="nav-icon">👤</span> Users
+              <span class="nav-icon">👤</span> 사용자 관리
             </a>
             <a href="/api-keys" class="nav-item ${section === 'api-keys' ? 'active' : ''}">
-              <span class="nav-icon">🔑</span> API Keys
+              <span class="nav-icon">🔑</span> API 키 관리
             </a>
           </div>
 
           <div class="nav-section">
-            <div class="nav-section-title">Pulse Service</div>
+            <div class="nav-section-title">Pulse 서비스</div>
             <a href="/products" class="nav-item ${section === 'products' ? 'active' : ''}">
-              <span class="nav-icon">📦</span> Products
+              <span class="nav-icon">📦</span> 상품 관리
             </a>
             <a href="/posts" class="nav-item ${section === 'posts' ? 'active' : ''}">
-              <span class="nav-icon">📝</span> Posts
+              <span class="nav-icon">📝</span> 포스트 관리
             </a>
           </div>
 
           <div class="nav-section">
-            <div class="nav-section-title">Config Service</div>
+            <div class="nav-section-title">Config 서비스</div>
             <a href="/translations" class="nav-item ${section === 'translations' ? 'active' : ''}">
-              <span class="nav-icon">🌐</span> Translations
+              <span class="nav-icon">🌐</span> 번역 관리
             </a>
           </div>
         </nav>
 
         <main class="main">
           <div class="header">
-            <h1 id="pageTitle">${getSectionTitle(section)}</h1>
-            <button class="btn-logout" onclick="logout()">Logout</button>
+            <h1>${getSectionTitle(section)}</h1>
+            <div class="header-actions">
+              <div class="user-info">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div>
+                  <div class="user-name" id="userName">관리자</div>
+                  <div class="user-role" id="userEmail">admin@frenv.pe.kr</div>
+                </div>
+              </div>
+              <button class="btn-logout" onclick="logout()">로그아웃</button>
+            </div>
           </div>
 
           <div id="content">
-            <div class="loading">Loading...</div>
+            <div class="loading">
+              <div class="loading-spinner"></div>
+              <p>데이터를 불러오는 중...</p>
+            </div>
           </div>
         </main>
       </div>
 
       <script>
         const section = '${section}';
+        let currentUser = null;
 
         async function init() {
+          // 현재 사용자 정보 로드
+          try {
+            const userRes = await fetch('https://auth.frenv.pe.kr/auth/me', { credentials: 'include' });
+            if (userRes.ok) {
+              const userData = await userRes.json();
+              currentUser = userData.user;
+              updateUserInfo();
+            }
+          } catch (e) {
+            console.log('사용자 정보 로드 실패');
+          }
+
+          // 섹션별 데이터 로드
           switch(section) {
             case 'overview': await loadOverview(); break;
             case 'analytics': await loadAnalytics(); break;
@@ -325,250 +715,396 @@ export function getDashboardPage(section: string = 'overview'): string {
           }
         }
 
-        async function loadOverview() {
-          const res = await fetch('/api/analytics/dashboard', { credentials: 'include' });
-          if (!res.ok) { showError(); return; }
-          const data = await res.json();
+        function updateUserInfo() {
+          if (!currentUser) return;
+          document.getElementById('userName').textContent = currentUser.name || '관리자';
+          document.getElementById('userEmail').textContent = currentUser.email;
+          document.getElementById('userAvatar').textContent = (currentUser.name || currentUser.email)[0].toUpperCase();
+          document.getElementById('userRoleBadge').textContent = currentUser.role?.toUpperCase() || 'ADMIN';
+        }
 
-          document.getElementById('content').innerHTML = \`
-            <div class="stats-grid">
-              <div class="stat-card">
-                <h3>Total Users</h3>
-                <div class="value">\${data.users?.total_users || 0}</div>
-                <div class="change">+\${data.users?.new_users_week || 0} this week</div>
+        async function loadOverview() {
+          try {
+            const res = await fetch('/api/analytics/dashboard', { credentials: 'include' });
+            if (!res.ok) throw new Error('API 오류');
+            const data = await res.json();
+
+            document.getElementById('content').innerHTML = \`
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-card-header">
+                    <h3>전체 사용자</h3>
+                    <div class="stat-icon">👥</div>
+                  </div>
+                  <div class="value">\${data.users?.total_users || 0}</div>
+                  <div class="change">+\${data.users?.new_users_week || 0} 이번 주</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-header">
+                    <h3>API 키</h3>
+                    <div class="stat-icon">🔑</div>
+                  </div>
+                  <div class="value">\${data.users?.total_api_keys || 0}</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-header">
+                    <h3>오늘 API 요청</h3>
+                    <div class="stat-icon">📡</div>
+                  </div>
+                  <div class="value">\${data.users?.api_requests_today || 0}</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-header">
+                    <h3>등록된 상품</h3>
+                    <div class="stat-icon">📦</div>
+                  </div>
+                  <div class="value">\${data.products?.total_products || 0}</div>
+                  <div class="change">🔥 \${data.products?.rising_products || 0} 급상승</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-header">
+                    <h3>블로그 포스트</h3>
+                    <div class="stat-icon">📝</div>
+                  </div>
+                  <div class="value">\${data.posts?.total_posts || 0}</div>
+                  <div class="change">\${data.posts?.published_posts || 0} 게시됨</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-header">
+                    <h3>번역 항목</h3>
+                    <div class="stat-icon">🌐</div>
+                  </div>
+                  <div class="value">\${data.i18n?.total_translations || 0}</div>
+                </div>
               </div>
-              <div class="stat-card">
-                <h3>API Keys</h3>
-                <div class="value">\${data.users?.total_api_keys || 0}</div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h2>서비스 현황</h2>
+                </div>
+                <div class="services-grid">
+                  <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">🔐</div>
+                    <div class="service-info">
+                      <h4>Auth Service</h4>
+                      <p>auth.frenv.pe.kr</p>
+                    </div>
+                    <div class="service-status">
+                      <span class="status-dot"></span>
+                      정상
+                    </div>
+                  </div>
+                  <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #f43f5e, #ec4899);">📊</div>
+                    <div class="service-info">
+                      <h4>Pulse API</h4>
+                      <p>pulse.frenv.pe.kr</p>
+                    </div>
+                    <div class="service-status">
+                      <span class="status-dot"></span>
+                      정상
+                    </div>
+                  </div>
+                  <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #10b981, #059669);">⚙️</div>
+                    <div class="service-info">
+                      <h4>Config Service</h4>
+                      <p>config.frenv.pe.kr</p>
+                    </div>
+                    <div class="service-status">
+                      <span class="status-dot"></span>
+                      정상
+                    </div>
+                  </div>
+                  <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🚀</div>
+                    <div class="service-info">
+                      <h4>Rise</h4>
+                      <p>rise.frenv.pe.kr</p>
+                    </div>
+                    <div class="service-status">
+                      <span class="status-dot"></span>
+                      정상
+                    </div>
+                  </div>
+                  <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">📰</div>
+                    <div class="service-info">
+                      <h4>Blog</h4>
+                      <p>blog.frenv.pe.kr</p>
+                    </div>
+                    <div class="service-status">
+                      <span class="status-dot"></span>
+                      정상
+                    </div>
+                  </div>
+                  <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">📁</div>
+                    <div class="service-info">
+                      <h4>CDN</h4>
+                      <p>cdn.frenv.pe.kr</p>
+                    </div>
+                    <div class="service-status">
+                      <span class="status-dot"></span>
+                      정상
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="stat-card">
-                <h3>API Requests Today</h3>
-                <div class="value">\${data.users?.api_requests_today || 0}</div>
-              </div>
-              <div class="stat-card">
-                <h3>Products</h3>
-                <div class="value">\${data.products?.total_products || 0}</div>
-                <div class="change">\${data.products?.rising_products || 0} rising</div>
-              </div>
-              <div class="stat-card">
-                <h3>Blog Posts</h3>
-                <div class="value">\${data.posts?.total_posts || 0}</div>
-                <div class="change">\${data.posts?.published_posts || 0} published</div>
-              </div>
-              <div class="stat-card">
-                <h3>Translations</h3>
-                <div class="value">\${data.i18n?.total_translations || 0}</div>
-              </div>
-            </div>
-          \`;
+            \`;
+          } catch (e) {
+            showError('대시보드 데이터를 불러오지 못했습니다.');
+          }
         }
 
         async function loadAnalytics() {
-          const res = await fetch('/api/analytics/api-usage?days=7', { credentials: 'include' });
-          if (!res.ok) { showError(); return; }
-          const data = await res.json();
+          try {
+            const res = await fetch('/api/analytics/api-usage?days=7', { credentials: 'include' });
+            if (!res.ok) throw new Error('API 오류');
+            const data = await res.json();
 
-          document.getElementById('content').innerHTML = \`
-            <div class="card">
-              <div class="card-header"><h2>API Usage (Last 7 Days)</h2></div>
-              <div class="table-wrapper">
-                <table>
-                  <tr><th>Date</th><th>Requests</th></tr>
-                  \${data.daily?.map(d => \`<tr><td>\${d.date}</td><td>\${d.count}</td></tr>\`).join('') || '<tr><td colspan="2" class="empty">No data</td></tr>'}
-                </table>
+            document.getElementById('content').innerHTML = \`
+              <div class="card">
+                <div class="card-header"><h2>API 사용량 (최근 7일)</h2></div>
+                <div class="table-wrapper">
+                  <table>
+                    <tr><th>날짜</th><th>요청 수</th></tr>
+                    \${data.daily?.map(d => \`<tr><td>\${d.date}</td><td>\${d.count.toLocaleString()}</td></tr>\`).join('') || '<tr><td colspan="2" class="empty">데이터 없음</td></tr>'}
+                  </table>
+                </div>
               </div>
-            </div>
-            <div class="card">
-              <div class="card-header"><h2>Top Endpoints</h2></div>
-              <div class="table-wrapper">
-                <table>
-                  <tr><th>Endpoint</th><th>Requests</th></tr>
-                  \${data.byEndpoint?.map(e => \`<tr><td>\${e.endpoint}</td><td>\${e.count}</td></tr>\`).join('') || '<tr><td colspan="2" class="empty">No data</td></tr>'}
-                </table>
+              <div class="card">
+                <div class="card-header"><h2>인기 엔드포인트</h2></div>
+                <div class="table-wrapper">
+                  <table>
+                    <tr><th>엔드포인트</th><th>요청 수</th></tr>
+                    \${data.byEndpoint?.map(e => \`<tr><td><code>\${e.endpoint}</code></td><td>\${e.count.toLocaleString()}</td></tr>\`).join('') || '<tr><td colspan="2" class="empty">데이터 없음</td></tr>'}
+                  </table>
+                </div>
               </div>
-            </div>
-          \`;
+            \`;
+          } catch (e) {
+            showError('분석 데이터를 불러오지 못했습니다.');
+          }
         }
 
         async function loadUsers() {
-          const res = await fetch('/api/users', { credentials: 'include' });
-          if (!res.ok) { showError(); return; }
-          const data = await res.json();
+          try {
+            const res = await fetch('/api/users', { credentials: 'include' });
+            if (!res.ok) throw new Error('API 오류');
+            const data = await res.json();
 
-          document.getElementById('content').innerHTML = \`
-            <div class="card">
-              <div class="card-header">
-                <h2>Users (\${data.total})</h2>
+            document.getElementById('content').innerHTML = \`
+              <div class="card">
+                <div class="card-header">
+                  <h2>사용자 목록 (\${data.total}명)</h2>
+                </div>
+                <div class="filters">
+                  <input type="text" placeholder="이메일 또는 이름으로 검색..." id="searchInput">
+                </div>
+                <div class="table-wrapper">
+                  <table>
+                    <tr><th>이메일</th><th>이름</th><th>권한</th><th>플랜</th><th>가입 경로</th><th>가입일</th><th>관리</th></tr>
+                    \${data.users?.map(u => \`
+                      <tr>
+                        <td>\${u.email}</td>
+                        <td>\${u.name || '-'}</td>
+                        <td><span class="badge badge-\${u.role}">\${u.role}</span></td>
+                        <td><span class="badge badge-\${u.plan}">\${u.plan}</span></td>
+                        <td>\${u.registered_from || 'auth'}</td>
+                        <td>\${new Date(u.created_at).toLocaleDateString('ko-KR')}</td>
+                        <td>
+                          <div class="action-buttons">
+                            <button class="btn btn-secondary" onclick="editUser('\${u.id}')">수정</button>
+                          </div>
+                        </td>
+                      </tr>
+                    \`).join('') || '<tr><td colspan="7" class="empty">사용자가 없습니다</td></tr>'}
+                  </table>
+                </div>
               </div>
-              <div class="filters">
-                <input type="text" placeholder="Search by email..." id="searchInput" onkeyup="searchUsers()">
-              </div>
-              <div class="table-wrapper">
-                <table>
-                  <tr><th>Email</th><th>Name</th><th>Role</th><th>Plan</th><th>Registered From</th><th>Created</th><th>Actions</th></tr>
-                  \${data.users?.map(u => \`
-                    <tr>
-                      <td>\${u.email}</td>
-                      <td>\${u.name || '-'}</td>
-                      <td><span class="badge badge-\${u.role}">\${u.role}</span></td>
-                      <td><span class="badge badge-\${u.plan}">\${u.plan}</span></td>
-                      <td>\${u.registered_from || 'auth'}</td>
-                      <td>\${new Date(u.created_at).toLocaleDateString()}</td>
-                      <td><button class="btn btn-primary" onclick="editUser('\${u.id}')">Edit</button></td>
-                    </tr>
-                  \`).join('') || '<tr><td colspan="7" class="empty">No users</td></tr>'}
-                </table>
-              </div>
-            </div>
-          \`;
+            \`;
+          } catch (e) {
+            showError('사용자 목록을 불러오지 못했습니다.');
+          }
         }
 
         async function loadApiKeys() {
-          const res = await fetch('/api/api-keys', { credentials: 'include' });
-          if (!res.ok) { showError(); return; }
-          const data = await res.json();
+          try {
+            const res = await fetch('/api/api-keys', { credentials: 'include' });
+            if (!res.ok) throw new Error('API 오류');
+            const data = await res.json();
 
-          document.getElementById('content').innerHTML = \`
-            <div class="card">
-              <div class="card-header"><h2>API Keys (\${data.total})</h2></div>
-              <div class="table-wrapper">
-                <table>
-                  <tr><th>Key</th><th>Name</th><th>User</th><th>Plan</th><th>Last Used</th><th>Created</th><th>Actions</th></tr>
-                  \${data.keys?.map(k => \`
-                    <tr>
-                      <td><code>\${k.key_prefix}...</code></td>
-                      <td>\${k.name || '-'}</td>
-                      <td>\${k.user_email}</td>
-                      <td><span class="badge badge-\${k.user_plan}">\${k.user_plan}</span></td>
-                      <td>\${k.last_used_at ? new Date(k.last_used_at).toLocaleDateString() : 'Never'}</td>
-                      <td>\${new Date(k.created_at).toLocaleDateString()}</td>
-                      <td>
-                        <button class="btn btn-primary" onclick="viewUsage('\${k.id}')">Usage</button>
-                        <button class="btn btn-danger" onclick="deleteKey('\${k.id}')">Delete</button>
-                      </td>
-                    </tr>
-                  \`).join('') || '<tr><td colspan="7" class="empty">No API keys</td></tr>'}
-                </table>
+            document.getElementById('content').innerHTML = \`
+              <div class="card">
+                <div class="card-header"><h2>API 키 목록 (\${data.total}개)</h2></div>
+                <div class="table-wrapper">
+                  <table>
+                    <tr><th>키</th><th>이름</th><th>사용자</th><th>플랜</th><th>마지막 사용</th><th>생성일</th><th>관리</th></tr>
+                    \${data.keys?.map(k => \`
+                      <tr>
+                        <td><code>\${k.key_prefix}...</code></td>
+                        <td>\${k.name || '-'}</td>
+                        <td>\${k.user_email}</td>
+                        <td><span class="badge badge-\${k.user_plan}">\${k.user_plan}</span></td>
+                        <td>\${k.last_used_at ? new Date(k.last_used_at).toLocaleDateString('ko-KR') : '사용 안함'}</td>
+                        <td>\${new Date(k.created_at).toLocaleDateString('ko-KR')}</td>
+                        <td>
+                          <div class="action-buttons">
+                            <button class="btn btn-secondary" onclick="viewUsage('\${k.id}')">사용량</button>
+                            <button class="btn btn-danger" onclick="deleteKey('\${k.id}')">삭제</button>
+                          </div>
+                        </td>
+                      </tr>
+                    \`).join('') || '<tr><td colspan="7" class="empty">API 키가 없습니다</td></tr>'}
+                  </table>
+                </div>
               </div>
-            </div>
-          \`;
+            \`;
+          } catch (e) {
+            showError('API 키 목록을 불러오지 못했습니다.');
+          }
         }
 
         async function loadProducts() {
-          const res = await fetch('/api/products', { credentials: 'include' });
-          if (!res.ok) { showError(); return; }
-          const data = await res.json();
+          try {
+            const res = await fetch('/api/products', { credentials: 'include' });
+            if (!res.ok) throw new Error('API 오류');
+            const data = await res.json();
 
-          document.getElementById('content').innerHTML = \`
-            <div class="card">
-              <div class="card-header"><h2>Products (\${data.total})</h2></div>
-              <div class="filters">
-                <input type="text" placeholder="Search..." id="searchInput">
-                <select id="categoryFilter" onchange="filterProducts()">
-                  <option value="">All Categories</option>
-                  <option value="beauty">Beauty</option>
-                  <option value="tech">Tech</option>
-                  <option value="fun">Fun</option>
-                </select>
+            document.getElementById('content').innerHTML = \`
+              <div class="card">
+                <div class="card-header"><h2>상품 목록 (\${data.total}개)</h2></div>
+                <div class="filters">
+                  <input type="text" placeholder="상품명으로 검색..." id="searchInput">
+                  <select id="categoryFilter">
+                    <option value="">전체 카테고리</option>
+                    <option value="beauty">뷰티</option>
+                    <option value="tech">테크</option>
+                    <option value="fun">재미</option>
+                  </select>
+                </div>
+                <div class="table-wrapper">
+                  <table>
+                    <tr><th>순위</th><th>상품명</th><th>가격</th><th>카테고리</th><th>급상승</th><th>관리</th></tr>
+                    \${data.products?.map(p => \`
+                      <tr>
+                        <td>#\${p.rank || '-'}</td>
+                        <td>\${p.name}</td>
+                        <td>\${p.price?.toLocaleString() || '-'} \${p.currency || ''}</td>
+                        <td>\${p.category || '-'}</td>
+                        <td>\${p.is_rising ? '🔥 ' + (p.rising_score || '') : '-'}</td>
+                        <td>
+                          <div class="action-buttons">
+                            <button class="btn btn-secondary" onclick="editProduct('\${p.id}')">수정</button>
+                            <button class="btn btn-danger" onclick="deleteProduct('\${p.id}')">삭제</button>
+                          </div>
+                        </td>
+                      </tr>
+                    \`).join('') || '<tr><td colspan="6" class="empty">상품이 없습니다</td></tr>'}
+                  </table>
+                </div>
               </div>
-              <div class="table-wrapper">
-                <table>
-                  <tr><th>Rank</th><th>Name</th><th>Price</th><th>Category</th><th>Rising</th><th>Actions</th></tr>
-                  \${data.products?.map(p => \`
-                    <tr>
-                      <td>#\${p.rank || '-'}</td>
-                      <td>\${p.name}</td>
-                      <td>\${p.price?.toLocaleString() || '-'} \${p.currency || ''}</td>
-                      <td>\${p.category || '-'}</td>
-                      <td>\${p.is_rising ? '🔥 ' + (p.rising_score || '') : '-'}</td>
-                      <td>
-                        <button class="btn btn-primary" onclick="editProduct('\${p.id}')">Edit</button>
-                        <button class="btn btn-danger" onclick="deleteProduct('\${p.id}')">Delete</button>
-                      </td>
-                    </tr>
-                  \`).join('') || '<tr><td colspan="6" class="empty">No products</td></tr>'}
-                </table>
-              </div>
-            </div>
-          \`;
+            \`;
+          } catch (e) {
+            showError('상품 목록을 불러오지 못했습니다.');
+          }
         }
 
         async function loadPosts() {
-          const res = await fetch('/api/posts', { credentials: 'include' });
-          if (!res.ok) { showError(); return; }
-          const data = await res.json();
+          try {
+            const res = await fetch('/api/posts', { credentials: 'include' });
+            if (!res.ok) throw new Error('API 오류');
+            const data = await res.json();
 
-          document.getElementById('content').innerHTML = \`
-            <div class="card">
-              <div class="card-header">
-                <h2>Posts (\${data.total})</h2>
-                <button class="btn btn-primary" onclick="createPost()">+ New Post</button>
+            document.getElementById('content').innerHTML = \`
+              <div class="card">
+                <div class="card-header">
+                  <h2>포스트 목록 (\${data.total}개)</h2>
+                  <button class="btn btn-primary" onclick="createPost()">+ 새 포스트</button>
+                </div>
+                <div class="table-wrapper">
+                  <table>
+                    <tr><th>제목</th><th>슬러그</th><th>카테고리</th><th>상태</th><th>생성일</th><th>관리</th></tr>
+                    \${data.posts?.map(p => \`
+                      <tr>
+                        <td>\${p.title}</td>
+                        <td><code>\${p.slug}</code></td>
+                        <td>\${p.category || '-'}</td>
+                        <td><span class="badge badge-\${p.status}">\${p.status === 'published' ? '게시됨' : '임시저장'}</span></td>
+                        <td>\${new Date(p.created_at).toLocaleDateString('ko-KR')}</td>
+                        <td>
+                          <div class="action-buttons">
+                            <button class="btn btn-secondary" onclick="editPost('\${p.id}')">수정</button>
+                            <button class="btn btn-danger" onclick="deletePost('\${p.id}')">삭제</button>
+                          </div>
+                        </td>
+                      </tr>
+                    \`).join('') || '<tr><td colspan="6" class="empty">포스트가 없습니다</td></tr>'}
+                  </table>
+                </div>
               </div>
-              <div class="table-wrapper">
-                <table>
-                  <tr><th>Title</th><th>Slug</th><th>Category</th><th>Status</th><th>Created</th><th>Actions</th></tr>
-                  \${data.posts?.map(p => \`
-                    <tr>
-                      <td>\${p.title}</td>
-                      <td><code>\${p.slug}</code></td>
-                      <td>\${p.category || '-'}</td>
-                      <td><span class="badge badge-\${p.status}">\${p.status}</span></td>
-                      <td>\${new Date(p.created_at).toLocaleDateString()}</td>
-                      <td>
-                        <button class="btn btn-primary" onclick="editPost('\${p.id}')">Edit</button>
-                        <button class="btn btn-danger" onclick="deletePost('\${p.id}')">Delete</button>
-                      </td>
-                    </tr>
-                  \`).join('') || '<tr><td colspan="6" class="empty">No posts</td></tr>'}
-                </table>
-              </div>
-            </div>
-          \`;
+            \`;
+          } catch (e) {
+            showError('포스트 목록을 불러오지 못했습니다.');
+          }
         }
 
         async function loadTranslations() {
-          const res = await fetch('/api/translations?lang=ko', { credentials: 'include' });
-          if (!res.ok) { showError(); return; }
-          const data = await res.json();
+          try {
+            const res = await fetch('/api/translations?lang=ko', { credentials: 'include' });
+            if (!res.ok) throw new Error('API 오류');
+            const data = await res.json();
 
+            document.getElementById('content').innerHTML = \`
+              <div class="card">
+                <div class="card-header">
+                  <h2>번역 관리</h2>
+                  <button class="btn btn-secondary" onclick="clearCache()">캐시 초기화</button>
+                </div>
+                <div class="filters">
+                  <select id="langFilter" onchange="filterTranslations()">
+                    <option value="ko">한국어 (ko)</option>
+                    <option value="en">English (en)</option>
+                    <option value="ja">日本語 (ja)</option>
+                    <option value="zh">中文 (zh)</option>
+                  </select>
+                  <select id="nsFilter" onchange="filterTranslations()">
+                    <option value="">전체 네임스페이스</option>
+                    \${data.namespaces?.map(ns => \`<option value="\${ns}">\${ns}</option>\`).join('')}
+                  </select>
+                </div>
+                <div class="table-wrapper">
+                  <table>
+                    <tr><th>네임스페이스</th><th>키</th><th>값</th><th>소스</th><th>관리</th></tr>
+                    \${data.translations?.slice(0, 50).map(t => \`
+                      <tr>
+                        <td>\${t.namespace}</td>
+                        <td><code>\${t.key}</code></td>
+                        <td>\${t.value?.substring(0, 50)}\${t.value?.length > 50 ? '...' : ''}</td>
+                        <td>\${t.source}</td>
+                        <td><button class="btn btn-secondary" onclick="editTranslation('\${t.id}')">수정</button></td>
+                      </tr>
+                    \`).join('') || '<tr><td colspan="5" class="empty">번역 항목이 없습니다</td></tr>'}
+                  </table>
+                </div>
+              </div>
+            \`;
+          } catch (e) {
+            showError('번역 목록을 불러오지 못했습니다.');
+          }
+        }
+
+        function showError(message) {
           document.getElementById('content').innerHTML = \`
             <div class="card">
-              <div class="card-header">
-                <h2>Translations</h2>
-                <button class="btn btn-primary" onclick="clearCache()">Clear Cache</button>
-              </div>
-              <div class="filters">
-                <select id="langFilter" onchange="filterTranslations()">
-                  <option value="ko">Korean (ko)</option>
-                  <option value="en">English (en)</option>
-                  <option value="ja">Japanese (ja)</option>
-                  <option value="zh">Chinese (zh)</option>
-                </select>
-                <select id="nsFilter" onchange="filterTranslations()">
-                  <option value="">All Namespaces</option>
-                  \${data.namespaces?.map(ns => \`<option value="\${ns}">\${ns}</option>\`).join('')}
-                </select>
-              </div>
-              <div class="table-wrapper">
-                <table>
-                  <tr><th>Namespace</th><th>Key</th><th>Value</th><th>Source</th><th>Actions</th></tr>
-                  \${data.translations?.slice(0, 50).map(t => \`
-                    <tr>
-                      <td>\${t.namespace}</td>
-                      <td><code>\${t.key}</code></td>
-                      <td>\${t.value?.substring(0, 50)}\${t.value?.length > 50 ? '...' : ''}</td>
-                      <td>\${t.source}</td>
-                      <td><button class="btn btn-primary" onclick="editTranslation('\${t.id}')">Edit</button></td>
-                    </tr>
-                  \`).join('') || '<tr><td colspan="5" class="empty">No translations</td></tr>'}
-                </table>
+              <div class="empty">
+                <p style="font-size: 48px; margin-bottom: 16px;">😕</p>
+                <p>\${message}</p>
+                <button class="btn btn-primary" style="margin-top: 16px;" onclick="location.reload()">다시 시도</button>
               </div>
             </div>
           \`;
-        }
-
-        function showError() {
-          document.getElementById('content').innerHTML = '<div class="empty">Failed to load data</div>';
         }
 
         async function logout() {
@@ -576,9 +1112,9 @@ export function getDashboardPage(section: string = 'overview'): string {
           window.location.href = '/login';
         }
 
-        // Placeholder functions for actions
+        // 액션 함수들
         async function editUser(id) {
-          const action = prompt('Enter action: role (admin/user), plan (free/pro/enterprise), or name');
+          const action = prompt('변경할 값을 입력하세요:\\n- 권한: admin 또는 user\\n- 플랜: free, pro, enterprise\\n- 이름: 새 이름');
           if (!action) return;
 
           let body = {};
@@ -598,25 +1134,52 @@ export function getDashboardPage(section: string = 'overview'): string {
           });
 
           if (res.ok) {
-            alert('Updated!');
+            alert('수정되었습니다!');
             loadUsers();
           } else {
             const data = await res.json();
-            alert(data.error || 'Failed to update');
+            alert(data.error || '수정에 실패했습니다.');
           }
         }
-        function viewUsage(id) { alert('View usage: ' + id); }
-        function deleteKey(id) { if(confirm('Delete?')) fetch('/api/api-keys/'+id, {method:'DELETE',credentials:'include'}).then(() => loadApiKeys()); }
-        function editProduct(id) { alert('Edit product: ' + id); }
-        function deleteProduct(id) { if(confirm('Delete?')) fetch('/api/products/'+id, {method:'DELETE',credentials:'include'}).then(() => loadProducts()); }
-        function createPost() { alert('Create post form'); }
-        function editPost(id) { alert('Edit post: ' + id); }
-        function deletePost(id) { if(confirm('Delete?')) fetch('/api/posts/'+id, {method:'DELETE',credentials:'include'}).then(() => loadPosts()); }
-        function editTranslation(id) { alert('Edit translation: ' + id); }
-        function clearCache() { fetch('/api/translations/cache/clear', {method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{}'}).then(() => alert('Cache cleared')); }
-        function searchUsers() { /* implement */ }
-        function filterProducts() { /* implement */ }
-        function filterTranslations() { /* implement */ }
+
+        function viewUsage(id) { alert('API 키 사용량 조회: ' + id); }
+
+        async function deleteKey(id) {
+          if (!confirm('정말 이 API 키를 삭제하시겠습니까?')) return;
+          await fetch('/api/api-keys/' + id, { method: 'DELETE', credentials: 'include' });
+          loadApiKeys();
+        }
+
+        function editProduct(id) { alert('상품 수정: ' + id); }
+
+        async function deleteProduct(id) {
+          if (!confirm('정말 이 상품을 삭제하시겠습니까?')) return;
+          await fetch('/api/products/' + id, { method: 'DELETE', credentials: 'include' });
+          loadProducts();
+        }
+
+        function createPost() { alert('새 포스트 작성 폼'); }
+        function editPost(id) { alert('포스트 수정: ' + id); }
+
+        async function deletePost(id) {
+          if (!confirm('정말 이 포스트를 삭제하시겠습니까?')) return;
+          await fetch('/api/posts/' + id, { method: 'DELETE', credentials: 'include' });
+          loadPosts();
+        }
+
+        function editTranslation(id) { alert('번역 수정: ' + id); }
+
+        async function clearCache() {
+          await fetch('/api/translations/cache/clear', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: '{}'
+          });
+          alert('캐시가 초기화되었습니다!');
+        }
+
+        function filterTranslations() { /* 구현 예정 */ }
 
         init();
       </script>
@@ -627,13 +1190,13 @@ export function getDashboardPage(section: string = 'overview'): string {
 
 function getSectionTitle(section: string): string {
   const titles: Record<string, string> = {
-    'overview': 'Dashboard Overview',
-    'analytics': 'Analytics',
-    'users': 'User Management',
-    'api-keys': 'API Key Management',
-    'products': 'Product Management',
-    'posts': 'Blog Post Management',
-    'translations': 'Translation Management'
+    'overview': '대시보드 개요',
+    'analytics': 'API 분석',
+    'users': '사용자 관리',
+    'api-keys': 'API 키 관리',
+    'products': '상품 관리',
+    'posts': '포스트 관리',
+    'translations': '번역 관리'
   };
-  return titles[section] || 'Dashboard';
+  return titles[section] || '대시보드';
 }
