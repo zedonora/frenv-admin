@@ -1,0 +1,24 @@
+{
+  "name": "frenv-admin",
+  "version": "1.0.0",
+  "description": "Frenv Admin Dashboard - Centralized management for all frenv services",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "deploy:production": "wrangler deploy --env production",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": ["admin", "dashboard", "cloudflare-workers"],
+  "author": "zedonora",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "hono": "^4.11.7"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260131.0",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.61.1"
+  }
+}
