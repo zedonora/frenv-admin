@@ -304,6 +304,136 @@ english.get('/leaderboard', async (c) => {
   }
 });
 
+// ========== 프로필/권한 관리 ==========
+
+// 프로필 목록
+english.get('/profiles', async (c) => {
+  try {
+    const limit = parseInt(c.req.query('limit') || '50');
+    const offset = parseInt(c.req.query('offset') || '0');
+    const search = c.req.query('search') || '';
+
+    let filter: Record<string, string> = {};
+    if (search) {
+      filter['or'] = `(email.ilike.*${search}*,name.ilike.*${search}*)`;
+    }
+
+    const result = await supabaseQuery(c.env.CONFIG_KV, 'profiles', {
+      select: 'id,email,name,role,level,total_xp,api_access_approved,created_at',
+      filter,
+      order: 'created_at.desc',
+      limit,
+      offset
+    });
+
+    return c.json({
+      profiles: result.data,
+      total: result.total,
+      limit,
+      offset
+    });
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
+// 프로필 상세
+english.get('/profiles/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+    const result = await supabaseQuery(c.env.CONFIG_KV, 'profiles', {
+      select: '*',
+      filter: { id: `eq.${id}` }
+    });
+
+    const data = result.data as any[];
+    if (!data || data.length === 0) {
+      return c.json({ error: '프로필을 찾을 수 없습니다' }, 404);
+    }
+
+    return c.json({ profile: data[0] });
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
+// 프로필 수정 (API 권한 토글 등)
+english.patch('/profiles/:id', async (c) => {
+  try {
+    const id = c.req.param('id');
+    const updates = await c.req.json<{
+      api_access_approved?: boolean;
+      role?: string;
+      name?: string;
+    }>();
+
+    const config = await getSupabaseConfig(c.env.CONFIG_KV);
+    if (!config) {
+      return c.json({ error: 'Supabase 설정이 없습니다' }, 400);
+    }
+
+    const response = await fetch(`${config.url}/rest/v1/profiles?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': config.serviceKey,
+        'Authorization': `Bearer ${config.serviceKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(updates)
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      return c.json({ error: `업데이트 실패: ${error}` }, 400);
+    }
+
+    const data = await response.json() as any[];
+    return c.json({ success: true, profile: data[0] });
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
+// API 권한 일괄 토글
+english.post('/profiles/bulk-approve', async (c) => {
+  try {
+    const { ids, approved } = await c.req.json<{
+      ids: string[];
+      approved: boolean;
+    }>();
+
+    if (!ids || ids.length === 0) {
+      return c.json({ error: 'ids 배열이 필요합니다' }, 400);
+    }
+
+    const config = await getSupabaseConfig(c.env.CONFIG_KV);
+    if (!config) {
+      return c.json({ error: 'Supabase 설정이 없습니다' }, 400);
+    }
+
+    // 각 ID에 대해 업데이트
+    const results = await Promise.all(
+      ids.map(async (id) => {
+        const response = await fetch(`${config.url}/rest/v1/profiles?id=eq.${id}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': config.serviceKey,
+            'Authorization': `Bearer ${config.serviceKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ api_access_approved: approved })
+        });
+        return { id, success: response.ok };
+      })
+    );
+
+    return c.json({ success: true, results });
+  } catch (e: any) {
+    return c.json({ error: e.message }, 500);
+  }
+});
+
 // ========== 설정 관리 ==========
 
 // Supabase 설정 저장
