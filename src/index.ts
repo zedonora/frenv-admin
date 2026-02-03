@@ -83,7 +83,11 @@ app.get('/products', (c) => c.html(getDashboardPage('products')));
 app.get('/posts', (c) => c.html(getDashboardPage('posts')));
 app.get('/translations', (c) => c.html(getDashboardPage('translations')));
 app.get('/analytics', (c) => c.html(getDashboardPage('analytics')));
+app.get('/config', (c) => c.html(getDashboardPage('config')));
+app.get('/common', (c) => c.html(getDashboardPage('common')));
 app.get('/english', (c) => c.html(getDashboardPage('english')));
+app.get('/game', (c) => c.html(getDashboardPage('game')));
+app.get('/invest', (c) => c.html(getDashboardPage('invest')));
 
 // 헬스 체크
 app.get('/health', (c) => {

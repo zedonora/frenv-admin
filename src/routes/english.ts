@@ -5,13 +5,24 @@ import { Hono } from 'hono';
 interface Env {
   AUTH_DB: D1Database;
   CONFIG_KV: KVNamespace;
+  ENGLISH_SUPABASE_URL?: string;
+  ENGLISH_SUPABASE_SERVICE_KEY?: string;
 }
 
 const english = new Hono<{ Bindings: Env }>();
 
-// Supabase 설정 (KV에서 가져옴)
-async function getSupabaseConfig(kv: KVNamespace) {
-  const config = await kv.get('english_supabase_config', 'json') as {
+// Supabase 설정 (환경 변수 우선, KV 폴백)
+async function getSupabaseConfig(env: Env) {
+  // 1. 환경 변수에서 확인 (wrangler secret)
+  if (env.ENGLISH_SUPABASE_URL && env.ENGLISH_SUPABASE_SERVICE_KEY) {
+    return {
+      url: env.ENGLISH_SUPABASE_URL,
+      serviceKey: env.ENGLISH_SUPABASE_SERVICE_KEY
+    };
+  }
+
+  // 2. KV에서 확인 (폴백)
+  const config = await env.CONFIG_KV.get('english_supabase_config', 'json') as {
     url: string;
     serviceKey: string;
   } | null;
@@ -20,7 +31,7 @@ async function getSupabaseConfig(kv: KVNamespace) {
 
 // Supabase API 호출 헬퍼
 async function supabaseQuery(
-  kv: KVNamespace,
+  env: Env,
   table: string,
   options: {
     select?: string;
@@ -30,9 +41,9 @@ async function supabaseQuery(
     offset?: number;
   } = {}
 ) {
-  const config = await getSupabaseConfig(kv);
+  const config = await getSupabaseConfig(env);
   if (!config) {
-    throw new Error('Supabase 설정이 없습니다. CONFIG_KV에 english_supabase_config를 설정하세요.');
+    throw new Error('Supabase 설정이 없습니다. wrangler secret으로 ENGLISH_SUPABASE_URL, ENGLISH_SUPABASE_SERVICE_KEY를 설정하세요.');
   }
 
   let url = `${config.url}/rest/v1/${table}?`;
@@ -79,7 +90,7 @@ async function supabaseQuery(
 // 전체 통계
 english.get('/stats', async (c) => {
   try {
-    const config = await getSupabaseConfig(c.env.CONFIG_KV);
+    const config = await getSupabaseConfig(c.env);
     if (!config) {
       return c.json({
         error: 'Supabase 설정 필요',
@@ -89,10 +100,10 @@ english.get('/stats', async (c) => {
 
     // 여러 테이블 통계 조회
     const [vocabResult, lessonsResult, logsResult, apiUsageResult] = await Promise.all([
-      supabaseQuery(c.env.CONFIG_KV, 'vocab_items', { select: 'id', limit: 1 }),
-      supabaseQuery(c.env.CONFIG_KV, 'daily_lessons', { select: 'id', limit: 1 }),
-      supabaseQuery(c.env.CONFIG_KV, 'study_logs', { select: 'id', limit: 1 }),
-      supabaseQuery(c.env.CONFIG_KV, 'api_usage_logs', { select: 'id', limit: 1 })
+      supabaseQuery(c.env, 'vocab_items', { select: 'id', limit: 1 }),
+      supabaseQuery(c.env, 'daily_lessons', { select: 'id', limit: 1 }),
+      supabaseQuery(c.env, 'study_logs', { select: 'id', limit: 1 }),
+      supabaseQuery(c.env, 'api_usage_logs', { select: 'id', limit: 1 })
     ]);
 
     return c.json({
@@ -120,7 +131,7 @@ english.get('/vocab', async (c) => {
       filter['or'] = `(word.ilike.*${search}*,definition.ilike.*${search}*)`;
     }
 
-    const result = await supabaseQuery(c.env.CONFIG_KV, 'vocab_items', {
+    const result = await supabaseQuery(c.env, 'vocab_items', {
       select: '*',
       filter,
       order: 'next_review_date.asc',
@@ -143,7 +154,7 @@ english.get('/vocab', async (c) => {
 english.get('/vocab/:id', async (c) => {
   try {
     const id = c.req.param('id');
-    const result = await supabaseQuery(c.env.CONFIG_KV, 'vocab_items', {
+    const result = await supabaseQuery(c.env, 'vocab_items', {
       select: '*',
       filter: { id: `eq.${id}` }
     });
@@ -166,7 +177,7 @@ english.get('/lessons', async (c) => {
     const limit = parseInt(c.req.query('limit') || '30');
     const offset = parseInt(c.req.query('offset') || '0');
 
-    const result = await supabaseQuery(c.env.CONFIG_KV, 'daily_lessons', {
+    const result = await supabaseQuery(c.env, 'daily_lessons', {
       select: '*',
       order: 'date.desc',
       limit,
@@ -188,7 +199,7 @@ english.get('/lessons', async (c) => {
 english.get('/lessons/:id', async (c) => {
   try {
     const id = c.req.param('id');
-    const result = await supabaseQuery(c.env.CONFIG_KV, 'daily_lessons', {
+    const result = await supabaseQuery(c.env, 'daily_lessons', {
       select: '*',
       filter: { id: `eq.${id}` }
     });
@@ -217,7 +228,7 @@ english.get('/study-logs', async (c) => {
       filter['activity_type'] = `eq.${type}`;
     }
 
-    const result = await supabaseQuery(c.env.CONFIG_KV, 'study_logs', {
+    const result = await supabaseQuery(c.env, 'study_logs', {
       select: '*',
       filter,
       order: 'created_at.desc',
@@ -244,7 +255,7 @@ english.get('/api-usage', async (c) => {
     const days = parseInt(c.req.query('days') || '7');
     const limit = parseInt(c.req.query('limit') || '100');
 
-    const result = await supabaseQuery(c.env.CONFIG_KV, 'api_usage_logs', {
+    const result = await supabaseQuery(c.env, 'api_usage_logs', {
       select: '*',
       order: 'created_at.desc',
       limit
@@ -289,7 +300,7 @@ english.get('/leaderboard', async (c) => {
   try {
     const limit = parseInt(c.req.query('limit') || '50');
 
-    const result = await supabaseQuery(c.env.CONFIG_KV, 'leaderboard', {
+    const result = await supabaseQuery(c.env, 'leaderboard', {
       select: '*',
       order: 'score.desc',
       limit
@@ -318,7 +329,7 @@ english.get('/profiles', async (c) => {
       filter['or'] = `(email.ilike.*${search}*,name.ilike.*${search}*)`;
     }
 
-    const result = await supabaseQuery(c.env.CONFIG_KV, 'profiles', {
+    const result = await supabaseQuery(c.env, 'profiles', {
       select: 'id,email,name,role,level,total_xp,api_access_approved,created_at',
       filter,
       order: 'created_at.desc',
@@ -341,7 +352,7 @@ english.get('/profiles', async (c) => {
 english.get('/profiles/:id', async (c) => {
   try {
     const id = c.req.param('id');
-    const result = await supabaseQuery(c.env.CONFIG_KV, 'profiles', {
+    const result = await supabaseQuery(c.env, 'profiles', {
       select: '*',
       filter: { id: `eq.${id}` }
     });
@@ -367,7 +378,7 @@ english.patch('/profiles/:id', async (c) => {
       name?: string;
     }>();
 
-    const config = await getSupabaseConfig(c.env.CONFIG_KV);
+    const config = await getSupabaseConfig(c.env);
     if (!config) {
       return c.json({ error: 'Supabase 설정이 없습니다' }, 400);
     }
@@ -407,7 +418,7 @@ english.post('/profiles/bulk-approve', async (c) => {
       return c.json({ error: 'ids 배열이 필요합니다' }, 400);
     }
 
-    const config = await getSupabaseConfig(c.env.CONFIG_KV);
+    const config = await getSupabaseConfig(c.env);
     if (!config) {
       return c.json({ error: 'Supabase 설정이 없습니다' }, 400);
     }
@@ -462,7 +473,7 @@ english.post('/config', async (c) => {
 // Supabase 설정 확인
 english.get('/config', async (c) => {
   try {
-    const config = await getSupabaseConfig(c.env.CONFIG_KV);
+    const config = await getSupabaseConfig(c.env);
     return c.json({
       configured: !!config,
       url: config?.url || null

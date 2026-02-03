@@ -67,3 +67,5 @@ custom_domain = true
 
 # Secrets (wrangler secret put 으로 설정):
 # - JWT_SECRET (Auth와 동일)
+# - ENGLISH_SUPABASE_URL (https://xxx.supabase.co)
+# - ENGLISH_SUPABASE_SERVICE_KEY (service_role key)
