@@ -1,0 +1,13 @@
+{
+  "project": {
+    "name": "frenv-admin",
+    "contextFiles": [
+      ".claude/CLAUDE.md",
+      "../.ai/context.json"
+    ]
+  },
+  "ai": {
+    "systemPrompt": "frenv admin service AI assistant. All responses in Korean. Reference .claude/CLAUDE.md. MUST write .claude/histories/YYYY-MM-DD.md history after completing work.",
+    "language": "ko"
+  }
+}

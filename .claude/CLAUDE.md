@@ -22,6 +22,7 @@
 | **English** | 학습 통계, 프로필/권한 관리 (Supabase) |
 | **Game** | 게임 미리보기, 정보 |
 | **Invest** | 서비스 상태, 연결 정보 |
+| **Webtoon** | 인스타툰 제작/운영 상태, 설정 안내 |
 
 ---
 
@@ -63,6 +64,9 @@ Auth Service의 JWT 토큰을 사용하며, `role: 'admin'`인 사용자만 허�
 
 # Invest 서비스
 /invest             투자 서비스 상태, 정보
+
+# Webtoon 서비스
+/webtoon            웹툰 서비스 운영 정보
 ```
 
 ---

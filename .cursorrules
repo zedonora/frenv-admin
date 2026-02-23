@@ -1,0 +1,21 @@
+# admin - Cursor IDE Rules
+
+## Required
+1. All responses in Korean
+2. Read `.claude/CLAUDE.md` before work
+3. Write `.claude/histories/YYYY-MM-DD.md` after work (BLOCKING)
+4. Update root `.ai/context.json`
+
+## Project
+- **Service**: admin.frenv.pe.kr
+- **Tech**: Hono + Multi-D1 + Supabase Proxy
+- **Docs**: .claude/CLAUDE.md
+
+## History Recording (BLOCKING REQUIREMENT)
+After completing ANY code work, you MUST write `.claude/histories/YYYY-MM-DD.md`:
+- AI tool name + model name
+- User request (original text)
+- Tasks performed
+- Features added (MOST IMPORTANT)
+- Files changed
+- Notes for next AI session

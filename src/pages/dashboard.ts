@@ -614,6 +614,41 @@ export function getDashboardPage(section: string = 'overview'): string {
           display: flex;
           gap: 8px;
         }
+
+        .grafana-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+          gap: 16px;
+          margin-bottom: 24px;
+        }
+
+        .grafana-panel {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-md);
+          padding: 16px;
+        }
+
+        .panel-title {
+          font-size: 12px;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.7px;
+          margin-bottom: 12px;
+        }
+
+        .availability-bar-wrap {
+          background: rgba(255, 255, 255, 0.06);
+          border-radius: 999px;
+          height: 10px;
+          overflow: hidden;
+          margin-top: 8px;
+        }
+
+        .availability-bar {
+          height: 100%;
+          background: linear-gradient(90deg, #ef4444 0%, #f59e0b 45%, #10b981 100%);
+        }
       </style>
     </head>
     <body>
@@ -628,6 +663,9 @@ export function getDashboardPage(section: string = 'overview'): string {
             <div class="nav-section-title">대시보드</div>
             <a href="/" class="nav-item ${section === 'overview' ? 'active' : ''}">
               <span class="nav-icon">📊</span> 개요
+            </a>
+            <a href="/service-dashboard" class="nav-item ${section === 'service-dashboard' ? 'active' : ''}">
+              <span class="nav-icon">🖥️</span> 서비스 대시보드
             </a>
             <a href="/analytics" class="nav-item ${section === 'analytics' ? 'active' : ''}">
               <span class="nav-icon">📈</span> 분석
@@ -669,6 +707,9 @@ export function getDashboardPage(section: string = 'overview'): string {
             <a href="/common" class="nav-item ${section === 'common' ? 'active' : ''}">
               <span class="nav-icon">📁</span> 파일 관리
             </a>
+            <a href="/notify" class="nav-item ${section === 'notify' ? 'active' : ''}">
+              <span class="nav-icon">🔔</span> 알림 봇 관리
+            </a>
           </div>
 
           <div class="nav-section">
@@ -689,6 +730,13 @@ export function getDashboardPage(section: string = 'overview'): string {
             <div class="nav-section-title">Invest 서비스</div>
             <a href="/invest" class="nav-item ${section === 'invest' ? 'active' : ''}">
               <span class="nav-icon">💰</span> 투자 관리
+            </a>
+          </div>
+
+          <div class="nav-section">
+            <div class="nav-section-title">Webtoon 서비스</div>
+            <a href="/webtoon" class="nav-item ${section === 'webtoon' ? 'active' : ''}">
+              <span class="nav-icon">🎨</span> 웹툰 관리
             </a>
           </div>
         </nav>
@@ -737,6 +785,7 @@ export function getDashboardPage(section: string = 'overview'): string {
           // 섹션별 데이터 로드
           switch(section) {
             case 'overview': await loadOverview(); break;
+            case 'service-dashboard': await loadServiceDashboard(); break;
             case 'analytics': await loadAnalytics(); break;
             case 'users': await loadUsers(); break;
             case 'api-keys': await loadApiKeys(); break;
@@ -748,6 +797,8 @@ export function getDashboardPage(section: string = 'overview'): string {
             case 'english': await loadEnglish(); break;
             case 'game': await loadGame(); break;
             case 'invest': await loadInvest(); break;
+            case 'webtoon': await loadWebtoon(); break;
+            case 'notify': await loadNotify(); break;
           }
         }
 
@@ -918,6 +969,17 @@ export function getDashboardPage(section: string = 'overview'): string {
                       개발 중
                     </div>
                   </div>
+                  <div class="service-card">
+                    <div class="service-icon" style="background: linear-gradient(135deg, #5b7cfa, #8b5cf6);">🎨</div>
+                    <div class="service-info">
+                      <h4>Webtoon</h4>
+                      <p>webtoon.frenv.pe.kr</p>
+                    </div>
+                    <div class="service-status">
+                      <span class="status-dot"></span>
+                      정상
+                    </div>
+                  </div>
                 </div>
               </div>
             \`;
@@ -954,6 +1016,125 @@ export function getDashboardPage(section: string = 'overview'): string {
             \`;
           } catch (e) {
             showError('분석 데이터를 불러오지 못했습니다.');
+          }
+        }
+
+        async function loadServiceDashboard() {
+          try {
+            const res = await fetch('/api/services/overview', { credentials: 'include' });
+            if (!res.ok) throw new Error('서비스 모니터링 API 오류');
+            const data = await res.json();
+            const summary = data.summary || {};
+            const services = data.services || [];
+            const usage = data.usage || [];
+
+            document.getElementById('content').innerHTML = \`
+              <div class="stats-grid">
+                <div class="stat-card">
+                  <div class="stat-card-header">
+                    <h3>전체 서비스</h3>
+                    <div class="stat-icon">🧩</div>
+                  </div>
+                  <div class="value">\${summary.totalServices || 0}</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-header">
+                    <h3>가용성</h3>
+                    <div class="stat-icon">✅</div>
+                  </div>
+                  <div class="value">\${summary.availabilityPercent || 0}%</div>
+                  <div class="change">\${summary.upServices || 0} UP / \${summary.downServices || 0} DOWN</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-header">
+                    <h3>평균 응답 시간</h3>
+                    <div class="stat-icon">⚡</div>
+                  </div>
+                  <div class="value">\${summary.avgLatencyMs || 0}ms</div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-card-header">
+                    <h3>요청량(24h)</h3>
+                    <div class="stat-icon">📡</div>
+                  </div>
+                  <div class="value">\${(summary.requests24h || 0).toLocaleString()}</div>
+                  <div class="change">7일 누적 \${(summary.requests7d || 0).toLocaleString()}</div>
+                </div>
+              </div>
+
+              <div class="grafana-grid">
+                <div class="grafana-panel">
+                  <div class="panel-title">Service Availability</div>
+                  <div style="font-size: 28px; font-weight: 700;">\${summary.availabilityPercent || 0}%</div>
+                  <div class="availability-bar-wrap">
+                    <div class="availability-bar" style="width: \${Math.min(summary.availabilityPercent || 0, 100)}%;"></div>
+                  </div>
+                  <div style="margin-top: 10px; color: var(--text-secondary); font-size: 12px;">
+                    마지막 갱신: \${data.updatedAt ? new Date(data.updatedAt).toLocaleString('ko-KR') : '-'}
+                  </div>
+                </div>
+                <div class="grafana-panel">
+                  <div class="panel-title">Response Time (avg)</div>
+                  <div style="font-size: 28px; font-weight: 700;">\${summary.avgLatencyMs || 0}ms</div>
+                  <div style="margin-top: 8px; color: var(--text-secondary); font-size: 12px;">
+                    서비스 평균 응답시간 (헬스체크 기준)
+                  </div>
+                </div>
+                <div class="grafana-panel">
+                  <div class="panel-title">Traffic Window</div>
+                  <div style="font-size: 24px; font-weight: 700;">\${(summary.requests24h || 0).toLocaleString()} req / 24h</div>
+                  <div style="margin-top: 8px; color: var(--text-secondary); font-size: 12px;">
+                    7일 누적: \${(summary.requests7d || 0).toLocaleString()} req
+                  </div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <h2>🟢 서비스 가용성</h2>
+                  <button class="btn btn-secondary" onclick="loadServiceDashboard()">새로고침</button>
+                </div>
+                <div class="table-wrapper">
+                  <table>
+                    <tr><th>서비스</th><th>상태</th><th>응답 시간</th><th>HTTP</th><th>카테고리</th><th>링크</th></tr>
+                    \${services.map(s => \`
+                      <tr>
+                        <td><strong>\${s.name}</strong></td>
+                        <td>
+                          <span class="badge" style="background:\${s.status === 'up' ? 'rgba(16,185,129,.2)' : 'rgba(239,68,68,.2)'}; color:\${s.status === 'up' ? '#34d399' : '#f87171'};">
+                            \${s.status === 'up' ? 'UP' : 'DOWN'}
+                          </span>
+                        </td>
+                        <td>\${s.latencyMs} ms</td>
+                        <td>\${s.httpStatus || '-'}</td>
+                        <td>\${s.category}</td>
+                        <td><a href="\${s.url}" target="_blank" style="color: var(--accent-primary)">열기</a></td>
+                      </tr>
+                    \`).join('')}
+                  </table>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header"><h2>📊 서비스별 사용량 창</h2></div>
+                <div class="services-grid">
+                  \${usage.map(item => \`
+                    <div class="service-card">
+                      <div class="service-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">📈</div>
+                      <div class="service-info">
+                        <h4>\${item.name}</h4>
+                        <p>\${item.metric}</p>
+                      </div>
+                      <div class="service-status" style="font-weight:700; font-size: 14px;">
+                        \${(item.value || 0).toLocaleString()} \${item.unit || ''}
+                      </div>
+                    </div>
+                  \`).join('')}
+                </div>
+              </div>
+            \`;
+          } catch (e) {
+            showError('서비스 대시보드를 불러오지 못했습니다.');
           }
         }
 
@@ -2137,6 +2318,326 @@ export function getDashboardPage(section: string = 'overview'): string {
           \`;
         }
 
+        // ========== WEBTOON 서비스 ==========
+        async function loadWebtoon() {
+          document.getElementById('content').innerHTML = \`
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-card-header">
+                  <h3>서비스 URL</h3>
+                  <div class="stat-icon">🌐</div>
+                </div>
+                <div class="value" style="font-size: 18px;">webtoon.frenv.pe.kr</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-header">
+                  <h3>런타임</h3>
+                  <div class="stat-icon">🐍</div>
+                </div>
+                <div class="value" style="font-size: 18px;">Python + Streamlit</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-header">
+                  <h3>에러 추적</h3>
+                  <div class="stat-icon">🪵</div>
+                </div>
+                <div class="value" style="font-size: 18px;">Sentry + App Log</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h2>🎨 Webtoon Studio</h2>
+                <a href="https://webtoon.frenv.pe.kr" target="_blank" class="btn btn-primary">서비스 열기</a>
+              </div>
+              <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                가족 인스타툰 제작, 캐릭터 자산 업로드, 에피소드 생성 및 합성 기능을 운영합니다.
+              </p>
+              <div class="services-grid">
+                <div class="service-card">
+                  <div class="service-icon" style="background: linear-gradient(135deg, #5b7cfa, #8b5cf6);">🔐</div>
+                  <div class="service-info">
+                    <h4>로그인 제어</h4>
+                    <p>secrets.toml 기반 선택적 인증</p>
+                  </div>
+                </div>
+                <div class="service-card">
+                  <div class="service-icon" style="background: linear-gradient(135deg, #10b981, #059669);">🖼️</div>
+                  <div class="service-info">
+                    <h4>웹툰 합성</h4>
+                    <p>일일 에피소드 자동 합성</p>
+                  </div>
+                </div>
+                <div class="service-card">
+                  <div class="service-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">⚙️</div>
+                  <div class="service-info">
+                    <h4>메타 동기화</h4>
+                    <p>.ai/.claude/.vscode 자동 기록</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" style="border-color: rgba(91, 124, 250, 0.35);">
+              <div class="card-header"><h2>📌 운영 메모</h2></div>
+              <div style="padding: 16px; background: rgba(91, 124, 250, 0.08); border-radius: 12px;">
+                <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.8;">
+                  • 커스텀 도메인 연결 시 Cloudflare CNAME은 <strong>DNS only(회색 구름)</strong>로 설정 권장<br>
+                  • Streamlit App URL과 CNAME 대상이 정확히 일치해야 404를 피할 수 있습니다<br>
+                  • 로그인은 <code>require_login</code>이 true일 때만 활성화되도록 구성되어 있습니다
+                </p>
+              </div>
+            </div>
+          \`;
+        }
+
+        // ── Notify (알림 봇 관리) ──
+        const COMMON_URL = 'https://common.frenv.pe.kr';
+
+        async function loadNotify() {
+          // 등록된 서비스 목록 로드
+          let services = [];
+          try {
+            const listRes = await fetch(COMMON_URL + '/notify/config');
+            const listData = await listRes.json();
+            if (listData.success) services = listData.services;
+          } catch (e) { console.error('서비스 목록 로드 실패', e); }
+
+          // 각 서비스 상세 정보 병렬 로드
+          const details = await Promise.all(
+            services.map(async (svc) => {
+              try {
+                const res = await fetch(COMMON_URL + '/notify/config/' + svc);
+                const data = await res.json();
+                return { service: svc, ...data };
+              } catch { return { service: svc, success: false }; }
+            })
+          );
+
+          document.getElementById('content').innerHTML = \`
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-card-header">
+                  <h3>등록된 봇</h3>
+                  <div class="stat-icon">🤖</div>
+                </div>
+                <div class="value">\${services.length}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-header">
+                  <h3>알림 게이트웨이</h3>
+                  <div class="stat-icon">🔗</div>
+                </div>
+                <div class="value" style="font-size: 16px;">common.frenv.pe.kr</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-header">
+                  <h3>저장소</h3>
+                  <div class="stat-icon">💾</div>
+                </div>
+                <div class="value" style="font-size: 16px;">KV (notify:*)</div>
+              </div>
+            </div>
+
+            <!-- 자동 셋업 폼 -->
+            <div class="card" style="border-color: rgba(16, 185, 129, 0.35);">
+              <div class="card-header"><h2>🚀 새 서비스 봇 자동 셋업</h2></div>
+              <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 14px;">
+                BotFather에서 받은 토큰만 입력하면 chatId 자동 감지 + KV 등록 + 테스트 메시지까지 한번에 처리됩니다.
+              </p>
+              <div style="display: grid; grid-template-columns: 1fr 2fr auto; gap: 12px; align-items: end;">
+                <div>
+                  <label style="display: block; color: var(--text-secondary); font-size: 12px; margin-bottom: 6px;">서비스명</label>
+                  <input id="setupService" type="text" placeholder="예: webtoon"
+                    style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px;" />
+                </div>
+                <div>
+                  <label style="display: block; color: var(--text-secondary); font-size: 12px; margin-bottom: 6px;">봇 토큰 (BotFather에서 복사)</label>
+                  <input id="setupToken" type="text" placeholder="123456789:AABBCCddEEffGGhhIIjjKKll..."
+                    style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px; font-family: monospace;" />
+                </div>
+                <button onclick="runSetup()" class="btn btn-primary" style="padding: 10px 24px; white-space: nowrap;">자동 셋업</button>
+              </div>
+              <div style="margin-top: 12px; display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: end;">
+                <div>
+                  <label style="display: block; color: var(--text-secondary); font-size: 12px; margin-bottom: 6px;">chatId (선택 - 비우면 자동 감지)</label>
+                  <input id="setupChatId" type="text" placeholder="자동 감지 또는 직접 입력 (예: 6155089270)"
+                    style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px; font-family: monospace;" />
+                </div>
+              </div>
+              <div id="setupResult" style="margin-top: 16px; display: none;"></div>
+            </div>
+
+            <!-- 등록된 서비스 목록 -->
+            <div class="card">
+              <div class="card-header">
+                <h2>📋 등록된 서비스 봇</h2>
+                <button onclick="loadNotify()" class="btn btn-secondary" style="padding: 8px 16px;">새로고침</button>
+              </div>
+              <div class="table-wrapper">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>서비스</th>
+                      <th>봇 토큰 (마스킹)</th>
+                      <th>Chat ID</th>
+                      <th>테스트</th>
+                      <th>삭제</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    \${details.length > 0 ? details.map(d => \`
+                      <tr>
+                        <td><strong>\${d.service}</strong></td>
+                        <td style="font-family: monospace; font-size: 13px;">\${d.botToken || '-'}</td>
+                        <td style="font-family: monospace;">\${d.chatId || '-'}</td>
+                        <td>
+                          <button onclick="testNotify('\${d.service}')" class="btn btn-primary" style="padding: 6px 14px; font-size: 12px;">
+                            테스트 전송
+                          </button>
+                        </td>
+                        <td>
+                          <button onclick="deleteNotify('\${d.service}')" class="btn" style="padding: 6px 14px; font-size: 12px; background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.3);">
+                            삭제
+                          </button>
+                        </td>
+                      </tr>
+                    \`).join('') : '<tr><td colspan="5" class="empty">등록된 서비스가 없습니다.</td></tr>'}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- 빠른 알림 전송 -->
+            <div class="card">
+              <div class="card-header"><h2>💬 빠른 알림 전송</h2></div>
+              <div style="display: grid; grid-template-columns: 200px 1fr auto; gap: 12px; align-items: end;">
+                <div>
+                  <label style="display: block; color: var(--text-secondary); font-size: 12px; margin-bottom: 6px;">대상 서비스</label>
+                  <select id="quickService" style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px;">
+                    \${services.map(s => \`<option value="\${s}">\${s}</option>\`).join('')}
+                  </select>
+                </div>
+                <div>
+                  <label style="display: block; color: var(--text-secondary); font-size: 12px; margin-bottom: 6px;">메시지</label>
+                  <input id="quickMessage" type="text" placeholder="전송할 메시지 입력..."
+                    style="width: 100%; padding: 10px 14px; background: var(--bg-primary); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: white; font-size: 14px;" />
+                </div>
+                <button onclick="sendQuickMessage()" class="btn btn-primary" style="padding: 10px 24px; white-space: nowrap;">전송</button>
+              </div>
+              <div id="quickResult" style="margin-top: 12px; display: none;"></div>
+            </div>
+          \`;
+        }
+
+        async function runSetup() {
+          const service = document.getElementById('setupService').value.trim();
+          const botToken = document.getElementById('setupToken').value.trim();
+          const chatId = document.getElementById('setupChatId').value.trim();
+          const resultEl = document.getElementById('setupResult');
+
+          if (!service || !botToken) {
+            resultEl.style.display = 'block';
+            resultEl.innerHTML = '<div style="padding: 12px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; color: #ef4444;">서비스명과 봇 토큰을 입력하세요.</div>';
+            return;
+          }
+
+          resultEl.style.display = 'block';
+          resultEl.innerHTML = '<div style="padding: 12px; background: rgba(102,126,234,0.1); border-radius: 8px; color: rgba(255,255,255,0.8);">⏳ 셋업 진행 중...</div>';
+
+          try {
+            const body = { botToken };
+            if (chatId) body.chatId = chatId;
+
+            const res = await fetch(COMMON_URL + '/notify/setup/' + service, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(body),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+              const stepsHtml = data.steps.map(s => {
+                const icon = s.status === 'success' ? '✅' : s.status === 'warning' ? '⚠️' : '❌';
+                return \`<div style="padding: 6px 0; font-size: 13px;">\${icon} <strong>\${s.step}</strong>: \${JSON.stringify(s.data || {})}</div>\`;
+              }).join('');
+
+              resultEl.innerHTML = \`
+                <div style="padding: 16px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 8px;">
+                  <div style="font-weight: 600; color: #10b981; margin-bottom: 8px;">✅ \${service} 봇 셋업 완료!</div>
+                  <div style="font-size: 13px; color: rgba(255,255,255,0.7);">
+                    Bot: @\${data.botInfo?.username || '?'} | Chat ID: \${data.chatId}
+                  </div>
+                  <div style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px;">
+                    \${stepsHtml}
+                  </div>
+                </div>
+              \`;
+              // 목록 새로고침
+              setTimeout(() => loadNotify(), 1500);
+            } else {
+              resultEl.innerHTML = \`
+                <div style="padding: 16px; background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px;">
+                  <div style="font-weight: 600; color: #ef4444; margin-bottom: 8px;">❌ 셋업 실패</div>
+                  <div style="font-size: 13px; color: rgba(255,255,255,0.7);">\${data.error}</div>
+                  \${data.steps ? '<div style="margin-top: 8px; font-size: 12px; color: rgba(255,255,255,0.5);">' + JSON.stringify(data.steps) + '</div>' : ''}
+                </div>
+              \`;
+            }
+          } catch (e) {
+            resultEl.innerHTML = '<div style="padding: 12px; background: rgba(239,68,68,0.1); border-radius: 8px; color: #ef4444;">네트워크 오류: ' + e.message + '</div>';
+          }
+        }
+
+        async function testNotify(service) {
+          try {
+            const res = await fetch(COMMON_URL + '/notify/telegram', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ service, message: '[frenv-admin] ' + service + ' 알림 테스트 (' + new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) + ')' }),
+            });
+            const data = await res.json();
+            alert(data.success ? service + ' 테스트 메시지 전송 완료!' : '전송 실패: ' + (data.error || 'Unknown'));
+          } catch (e) { alert('오류: ' + e.message); }
+        }
+
+        async function deleteNotify(service) {
+          if (!confirm(service + ' 봇 설정을 삭제하시겠습니까?')) return;
+          try {
+            const res = await fetch(COMMON_URL + '/notify/config/' + service, { method: 'DELETE' });
+            const data = await res.json();
+            if (data.success) { alert(service + ' 삭제 완료'); loadNotify(); }
+            else alert('삭제 실패: ' + (data.error || 'Unknown'));
+          } catch (e) { alert('오류: ' + e.message); }
+        }
+
+        async function sendQuickMessage() {
+          const service = document.getElementById('quickService').value;
+          const message = document.getElementById('quickMessage').value.trim();
+          const resultEl = document.getElementById('quickResult');
+
+          if (!message) { alert('메시지를 입력하세요.'); return; }
+
+          try {
+            const res = await fetch(COMMON_URL + '/notify/telegram', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ service, message }),
+            });
+            const data = await res.json();
+            resultEl.style.display = 'block';
+            if (data.success) {
+              resultEl.innerHTML = '<div style="padding: 10px; background: rgba(16,185,129,0.1); border-radius: 8px; color: #10b981; font-size: 13px;">✅ ' + service + '로 전송 완료!</div>';
+              document.getElementById('quickMessage').value = '';
+            } else {
+              resultEl.innerHTML = '<div style="padding: 10px; background: rgba(239,68,68,0.1); border-radius: 8px; color: #ef4444; font-size: 13px;">❌ 전송 실패: ' + (data.error || 'Unknown') + '</div>';
+            }
+          } catch (e) {
+            resultEl.style.display = 'block';
+            resultEl.innerHTML = '<div style="padding: 10px; background: rgba(239,68,68,0.1); border-radius: 8px; color: #ef4444; font-size: 13px;">네트워크 오류: ' + e.message + '</div>';
+          }
+        }
+
         init();
       </script>
     </body>
@@ -2147,6 +2648,7 @@ export function getDashboardPage(section: string = 'overview'): string {
 function getSectionTitle(section: string): string {
   const titles: Record<string, string> = {
     'overview': '대시보드 개요',
+    'service-dashboard': '서비스 대시보드',
     'analytics': 'API 분석',
     'users': '사용자 관리',
     'api-keys': 'API 키 관리',
@@ -2157,7 +2659,9 @@ function getSectionTitle(section: string): string {
     'common': '파일 관리',
     'english': 'English 학습 관리',
     'game': '게임 관리',
-    'invest': '투자 관리'
+    'invest': '투자 관리',
+    'webtoon': 'Webtoon 관리',
+    'notify': '알림 봇 관리'
   };
   return titles[section] || '대시보드';
 }
