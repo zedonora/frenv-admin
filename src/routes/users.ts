@@ -6,7 +6,7 @@ interface Env {
   AUTH_DB: D1Database;
 }
 
-const users = new Hono<{ Bindings: Env }>();
+const users = new Hono<{ Bindings: Env; Variables: { user: AdminUser } }>();
 
 // 사용자 목록
 users.get('/', async (c) => {

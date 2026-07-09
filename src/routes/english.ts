@@ -80,7 +80,7 @@ async function supabaseQuery(
   });
 
   const total = parseInt(response.headers.get('content-range')?.split('/')[1] || '0');
-  const data = await response.json();
+  const data = await response.json() as any;
 
   return { data, total };
 }

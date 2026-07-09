@@ -78,7 +78,7 @@ async function verifyJwt(token: string, secret: string): Promise<JwtPayload | nu
  * Admin 인증 미들웨어
  * - Admin role만 접근 가능
  */
-export async function adminAuth(c: Context<{ Bindings: Env }>, next: Next) {
+export async function adminAuth(c: Context<{ Bindings: Env; Variables: { user: AdminUser } }>, next: Next) {
   // 로그인 페이지와 헬스 체크는 인증 제외
   const path = new URL(c.req.url).pathname;
   if (path === '/login' || path === '/health') {
