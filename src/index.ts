@@ -12,6 +12,7 @@ import postsRoutes from './routes/posts';
 import translationsRoutes from './routes/translations';
 import analyticsRoutes from './routes/analytics';
 import englishRoutes from './routes/english';
+import novelRoutes from './routes/novel';
 import servicesRoutes from './routes/services';
 import { getDashboardPage, getLoginPage } from './pages/dashboard';
 
@@ -23,6 +24,8 @@ export interface Env {
   JWT_SECRET: string;
   ENVIRONMENT: string;
   ADMIN_EMAIL: string;
+  NOVEL_SUPABASE_URL?: string;
+  NOVEL_SUPABASE_SERVICE_KEY?: string;
 }
 
 const app = new Hono<{ Bindings: Env }>();
@@ -72,6 +75,7 @@ app.route('/api/posts', postsRoutes);
 app.route('/api/translations', translationsRoutes);
 app.route('/api/analytics', analyticsRoutes);
 app.route('/api/english', englishRoutes);
+app.route('/api/novel', novelRoutes);
 app.route('/api/services', servicesRoutes);
 
 // 대시보드 페이지
@@ -92,6 +96,7 @@ app.get('/english', (c) => c.html(getDashboardPage('english')));
 app.get('/game', (c) => c.html(getDashboardPage('game')));
 app.get('/invest', (c) => c.html(getDashboardPage('invest')));
 app.get('/webtoon', (c) => c.html(getDashboardPage('webtoon')));
+app.get('/novel', (c) => c.html(getDashboardPage('novel')));
 app.get('/notify', (c) => c.html(getDashboardPage('notify')));
 
 // 헬스 체크

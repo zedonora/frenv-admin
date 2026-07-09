@@ -739,6 +739,13 @@ export function getDashboardPage(section: string = 'overview'): string {
               <span class="nav-icon">🎨</span> 웹툰 관리
             </a>
           </div>
+
+          <div class="nav-section">
+            <div class="nav-section-title">Novel 서비스</div>
+            <a href="/novel" class="nav-item ${section === 'novel' ? 'active' : ''}">
+              <span class="nav-icon">📖</span> 웹소설 관리
+            </a>
+          </div>
         </nav>
 
         <main class="main">
@@ -798,6 +805,7 @@ export function getDashboardPage(section: string = 'overview'): string {
             case 'game': await loadGame(); break;
             case 'invest': await loadInvest(); break;
             case 'webtoon': await loadWebtoon(); break;
+            case 'novel': await loadNovel(); break;
             case 'notify': await loadNotify(); break;
           }
         }
@@ -2391,6 +2399,134 @@ export function getDashboardPage(section: string = 'overview'): string {
           \`;
         }
 
+        // ── Novel (웹소설 관리) ──
+        async function loadNovel() {
+          const content = document.getElementById('content');
+          content.innerHTML = '<div style="padding:40px;text-align:center;color:#888">불러오는 중…</div>';
+          try {
+            const [epR, mR, fbR] = await Promise.all([
+              fetch('/api/novel/episodes'),
+              fetch('/api/novel/metrics'),
+              fetch('/api/novel/feedback'),
+            ]);
+            const episodes = (await epR.json()).episodes || [];
+            const metrics = (await mR.json()).metrics || [];
+            const feedback = (await fbR.json()).feedback || [];
+            const mByEp = {}; metrics.forEach(m => { mByEp[m.ep] = m; });
+
+            const avgDlg = metrics.length ? Math.round(metrics.reduce((s,m)=>s+(m.dialogue_ratio||0),0)/metrics.length) : 0;
+            const lastEp = episodes.length ? episodes[episodes.length-1].ep : 0;
+            const pending = feedback.filter(f=>!f.applied).length;
+            const esc = (s) => String(s==null?'':s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+            // 대사% 추이 바 차트(15% 미만=서술 과다 경고색)
+            const bars = metrics.map(m => {
+              const low = (m.dialogue_ratio||0) < 15;
+              return \`<div style="display:flex;align-items:center;gap:10px;margin:6px 0">
+                <span style="width:44px;color:#888;font-size:12px">\${m.ep}화</span>
+                <div style="flex:1;background:#f0f0f0;border-radius:4px;height:16px;overflow:hidden">
+                  <div style="width:\${m.dialogue_ratio||0}%;background:\${low?'#dc6666':'#5a9e78'};height:100%"></div>
+                </div>
+                <span style="width:64px;text-align:right;font-size:12px;color:\${low?'#dc6666':'#666'}">\${m.dialogue_ratio??'-'}%</span>
+              </div>\`;
+            }).join('');
+
+            const rows = episodes.map(e => {
+              const m = mByEp[e.ep] || {};
+              const dlg = m.dialogue_ratio;
+              const over = (m.overused_terms||[]).join(', ');
+              return \`<tr>
+                <td>\${e.ep}</td>
+                <td>\${esc(e.title)}</td>
+                <td style="color:#888">\${esc(e.type)}</td>
+                <td>\${e.char_count||0}자</td>
+                <td style="color:\${(dlg||0)<15?'#dc6666':'#333'}">\${dlg??'-'}%</td>
+                <td style="font-size:12px;color:#999">\${esc(over)}</td>
+              </tr>\`;
+            }).join('');
+
+            const fbRows = feedback.map(f => \`<tr>
+              <td style="color:#888">\${f.ep||'-'}</td>
+              <td>\${esc(f.content)}</td>
+              <td style="color:#999;font-size:12px">\${esc(f.source)}</td>
+              <td><button onclick="novelToggleFeedback(\${f.id}, \${!f.applied})" class="btn btn-secondary" style="padding:4px 10px;font-size:12px">\${f.applied?'✅ 반영됨':'미반영'}</button></td>
+            </tr>\`).join('') || '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:20px">아직 피드백이 없습니다</td></tr>';
+
+            content.innerHTML = \`
+              <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px">
+                <div style="flex:1;min-width:140px;padding:20px;border:1px solid #eee;border-radius:10px">
+                  <div style="font-size:28px;font-weight:700">\${lastEp}</div>
+                  <div style="color:#888;font-size:13px">확정 화</div>
+                </div>
+                <div style="flex:1;min-width:140px;padding:20px;border:1px solid #eee;border-radius:10px">
+                  <div style="font-size:28px;font-weight:700;color:\${avgDlg<15?'#dc6666':'#333'}">\${avgDlg}%</div>
+                  <div style="color:#888;font-size:13px">평균 대사 비중 \${avgDlg<20?'(낮음 — 서술 과다)':''}</div>
+                </div>
+                <div style="flex:1;min-width:140px;padding:20px;border:1px solid #eee;border-radius:10px">
+                  <div style="font-size:28px;font-weight:700">\${pending}</div>
+                  <div style="color:#888;font-size:13px">미반영 피드백</div>
+                </div>
+              </div>
+
+              <section style="margin-bottom:32px">
+                <h2 style="font-size:16px;margin-bottom:6px">화별 대사 비중 추이</h2>
+                <p style="color:#999;font-size:13px;margin-bottom:14px">15% 미만(붉은색)은 서술 과다 — 독자 이탈 위험 신호</p>
+                \${bars || '<p style="color:#aaa">지표 없음</p>'}
+              </section>
+
+              <section style="margin-bottom:32px">
+                <h2 style="font-size:16px;margin-bottom:12px">확정 화 목록</h2>
+                <div style="overflow-x:auto">
+                <table style="width:100%;border-collapse:collapse;font-size:14px">
+                  <thead><tr style="text-align:left;border-bottom:2px solid #eee;color:#888;font-size:12px">
+                    <th style="padding:8px">화</th><th>제목</th><th>유형</th><th>분량</th><th>대사%</th><th>과용 표현</th>
+                  </tr></thead>
+                  <tbody>\${rows}</tbody>
+                </table>
+                </div>
+              </section>
+
+              <section>
+                <h2 style="font-size:16px;margin-bottom:12px">독자 피드백</h2>
+                <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+                  <input id="novelFbEp" type="number" placeholder="화(선택)" style="width:90px;padding:8px;border:1px solid #ddd;border-radius:6px">
+                  <input id="novelFbContent" type="text" placeholder="피드백 내용 (생성 시 반영됨)" style="flex:1;min-width:200px;padding:8px;border:1px solid #ddd;border-radius:6px">
+                  <button onclick="novelAddFeedback()" class="btn" style="padding:8px 16px">추가</button>
+                </div>
+                <div style="overflow-x:auto">
+                <table style="width:100%;border-collapse:collapse;font-size:14px">
+                  <thead><tr style="text-align:left;border-bottom:2px solid #eee;color:#888;font-size:12px">
+                    <th style="padding:8px">화</th><th>내용</th><th>출처</th><th>반영</th>
+                  </tr></thead>
+                  <tbody>\${fbRows}</tbody>
+                </table>
+                </div>
+              </section>
+            \`;
+          } catch (e) {
+            content.innerHTML = '<div style="padding:40px;color:#dc6666">불러오기 실패: ' + e.message + ' (NOVEL_SUPABASE secret 설정 확인)</div>';
+          }
+        }
+
+        async function novelAddFeedback() {
+          const ep = document.getElementById('novelFbEp').value;
+          const content = document.getElementById('novelFbContent').value;
+          if (!content.trim()) { alert('내용을 입력하세요'); return; }
+          const res = await fetch('/api/novel/feedback', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ content, ep: ep ? Number(ep) : null, source: 'web' }),
+          });
+          if (res.ok) loadNovel(); else alert('추가 실패');
+        }
+
+        async function novelToggleFeedback(id, applied) {
+          await fetch('/api/novel/feedback/' + id, {
+            method: 'PATCH', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ applied }),
+          });
+          loadNovel();
+        }
+
         // ── Notify (알림 봇 관리) ──
         const COMMON_URL = 'https://common.frenv.pe.kr';
 
@@ -2661,6 +2797,7 @@ function getSectionTitle(section: string): string {
     'game': '게임 관리',
     'invest': '투자 관리',
     'webtoon': 'Webtoon 관리',
+    'novel': 'Novel 웹소설 관리',
     'notify': '알림 봇 관리'
   };
   return titles[section] || '대시보드';
